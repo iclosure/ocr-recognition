@@ -1,0 +1,4 @@
+#ifndef JBUFFERSERIES_H
+#define JBUFFERSERIES_H
+
+#endif  // JBUFFERSERIES_H

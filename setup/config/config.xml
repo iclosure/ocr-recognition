@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+  <Name>@PROJECT_DISPLAY_NAME@</Name>
+  <Version>@VERSION@</Version>
+  <Title>OCR_DEVINFO</Title>
+  <Publisher>Smartsoft</Publisher>
+  <StartMenuDir>Smartsoft Software</StartMenuDir>
+  <TargetDir>C:/@Publisher@/@Name@/@Version@</TargetDir>
+  <MaintenanceToolName>Uninstall</MaintenanceToolName>
+  <InstallerApplicationIcon>favicon</InstallerApplicationIcon>
+  <InstallerWindowIcon>favicon</InstallerWindowIcon>
+  <Logo>favicon.png</Logo>
+</Installer>

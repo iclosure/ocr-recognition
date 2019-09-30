@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <Name>com.smartsoft.desktop.app</Name>
+  <DisplayName>@PROJECT_DISPLAY_NAME@ Application</DisplayName>
+  <Description>@PROJECT_DISPLAY_NAME@ Application</Description>
+  <Version>@VERSION@</Version>
+  <ReleaseDate>2018-01-13</ReleaseDate>
+  <Script>installscript.js</Script>
+  <SortingPriority>1</SortingPriority>
+  <Virtual>true</Virtual>
+  <ForcedInstallation>true</ForcedInstallation>
+  <Dependencies>com.smartsoft.desktop.modules,com.smartsoft.desktop.qt</Dependencies>
+</Package>

@@ -1,0 +1,8 @@
+
+-- V1.0.0
+    tools: VS2015，Qt5.10.0，Qbs>=1.10.0
+    depends:
+        1) jframework: v2.9.0
+        1) datastudio: v4.7.14
+    fixed:
+        1) 功能完善

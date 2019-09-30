@@ -1,0 +1,4 @@
+#ifndef JLINESERIES_H
+#define JLINESERIES_H
+
+#endif  // JLINESERIES_H
