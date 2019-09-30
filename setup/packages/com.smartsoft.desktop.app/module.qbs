@@ -79,7 +79,7 @@ PackageApp {
     Group {
         name: 'data-app-tesseract'
         prefix: FileInfo.joinPaths(tesseractDir, 'bin') + '/'
-        files: [ 'pvt.cppan.demo.*.dll', 'tesseract*.dll' ]
+        files: [ 'pvt.cppan.demo.*.dll', 'tesseract*[^d].dll' ]
         qbs.install: true
         qbs.installPrefix: dataInstallPrefix
         qbs.installDir: 'bin'
