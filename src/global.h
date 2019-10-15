@@ -1,26 +1,23 @@
 ﻿#ifndef global_H
 #define global_H
 
-#include "protowidget/JNotify.h"
+#include "jwt/JNotify.h"
+#include "jwt/3rdpart/jsoncpp/json_tool.h"
 #include <QObject>
 #include <QStandardItem>
 #include <QEvent>
 #include <memory>
 
 namespace J {
-
 class Item;
 typedef std::shared_ptr<Item> ItemPtr;
-
 class Parser;
 typedef std::shared_ptr<Parser> ParserPtr;
-
-class JNotify;
-typedef std::shared_ptr<JNotify> JNotifyPtr;
-
 }
 
-using J::JNEvent;
+class JNEvent;
+class JNotify;
+typedef std::shared_ptr<JNotify> JNotifyPtr;
 
 // class JMain
 
@@ -69,8 +66,8 @@ public:
 
     MainWindow *mainWindow() const;
 
-    J::JNotifyPtr notify();
-    const J::JNotifyPtr &notify() const;
+    JNotifyPtr notify();
+    const JNotifyPtr &notify() const;
 
     Json::Value config(const QString &path) const;
     bool setConfig(const QString &path, const Json::Value &config);

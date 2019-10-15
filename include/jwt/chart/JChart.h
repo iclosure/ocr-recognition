@@ -266,7 +266,7 @@ public:
     QObjectUserData *userData() const;
     void setUserData(QObjectUserData *data);
 
-    void setTrackerPos(const QPointF &pos, bool visible);
+    void setTrackerPos(int index, const QPointF &pos = QPointF(-1, -1));
     void markTrackerPos(const QPointF &pos);
 
     QList<QColor> colorPalette();
@@ -303,7 +303,7 @@ Q_SIGNALS:
     void seriesRemoved(int index);
     void triggledZoomReset();
     void triggledClose();
-    void trackerChanged(const QPointF &pos, bool visible);
+    void trackerChanged(int index, const QPointF &pos);
     void trackerMarked(const QPointF &pos);
     void trackerMarkerCleared();
     void defShiftCountChanged(int count);
@@ -312,8 +312,8 @@ Q_SIGNALS:
 
 public Q_SLOTS:
     void setZoomerColor(const QColor &color);
-
     void togglePlay(bool checked);
+    void setTrackIndex(int index);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

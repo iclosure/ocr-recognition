@@ -8,7 +8,7 @@ import qbs.Utilities
 PluginLibrary {
 
     property pathList dynamicLibraryPaths: [
-        project.sourceDirectory + '/lib'
+        project.sourceDirectory + '/lib/' + project.archDir
     ]
 
     Depends { name: 'Qt.qml' }
@@ -43,6 +43,7 @@ PluginLibrary {
 
     Rule {
         condition: qbs.buildVariant !== 'debug'
+                   && (!qbs.targetOS.contains("windows") || qbs.architecture != 'x86_64')
         multiplex: true
         inputs: [ 'dynamiclibrary' ].concat(qmlfiles.fileTags)
         Artifact { fileTags: [ 'qmltype.out' ] }

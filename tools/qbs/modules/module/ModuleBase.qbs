@@ -5,19 +5,10 @@ Module {
     version: '1.0.0'
 
     property string moduleName: name
-    property string variantSuffix: {
-        var suffix = ''
-        if (qbs.architecture == 'x86_64') {
-            suffix += '64'
-        }
-        if (qbs.buildVariant == 'debug') {
-            suffix += 'd'
-        }
-        return suffix
-    }
+    property string variantSuffix: qbs.buildVariant == 'debug' ? 'd' : ''
     property bool isDynamicLibrary: true
     property path includePaths: project.sourceDirectory + '/include'
-    property path libraryPaths: project.sourceDirectory + "/lib"
+    property path libraryPaths: project.sourceDirectory + '/lib/' + project.archDir
 
     Depends { name: "cpp" }
 

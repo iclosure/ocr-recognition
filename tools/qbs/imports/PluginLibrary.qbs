@@ -12,8 +12,8 @@ CppLibrary {
     property string uri: ''
     property string uriDir: uri.replace('.', '/')
     property string pluginVersion: version.split('.', 2).join('.')
-    property path destinationRoot: FileInfo.joinPaths(project.sourceDirectory,
-                                                      'lib', modulePath, 'meta')
+    property path destinationRoot: FileInfo.joinPaths(project.sourceDirectory, 'lib',
+                                                      project.archDir, modulePath, 'meta')
     property stringList dependencies: []
 
     destinationDirectory: FileInfo.joinPaths(destinationRoot, uriDir)

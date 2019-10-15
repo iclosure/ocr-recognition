@@ -44,8 +44,8 @@ signals:
     void languageChanged(const QString &language);
 
 public slots:
-    void setLocaleName(const QString &localeName);
-    void setLanguage(const QString &language);
+    void setLocaleName(const QString &localeName, bool updateConfig = false);
+    void setLanguage(const QString &language, bool updateConfig = false);
 
 private:
     Q_DISABLE_COPY(JLangManager)

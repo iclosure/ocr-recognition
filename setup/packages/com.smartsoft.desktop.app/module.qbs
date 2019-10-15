@@ -68,8 +68,11 @@ PackageApp {
     // 3rdpart - opencv
     Group {
         name: 'data-app-opencv'
-        prefix: FileInfo.joinPaths(opencvDir, 'bin') + '/'
-        files: [ 'opencv_videoio_ffmpeg411_64.dll' ]
+        prefix: opencvDir + '/'
+        files: [
+            'bin/opencv_videoio_ffmpeg411_64.dll',
+            'x64/vc15/bin/opencv_world411.dll'
+        ]
         qbs.install: true
         qbs.installPrefix: dataInstallPrefix
         qbs.installDir: 'bin'
@@ -83,5 +86,17 @@ PackageApp {
         qbs.install: true
         qbs.installPrefix: dataInstallPrefix
         qbs.installDir: 'bin'
+    }
+
+    // 3rdpart - tessdata
+    Group {
+        name: 'data-app-tessdata'
+        prefix: project.sourceDirectory + '/tools/tessdata/'
+        files: [
+            '*.traineddata'
+        ]
+        qbs.install: true
+        qbs.installPrefix: dataInstallPrefix
+        qbs.installDir: 'tessdata'
     }
 }

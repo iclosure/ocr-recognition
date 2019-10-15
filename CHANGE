@@ -1,4 +1,12 @@
 
+-- V1.0.1
+    tools: VS2015，Qt5.10.0，Qbs>=1.10.0
+    depends:
+        1) jframework: v2.10.0
+        1) datastudio: v4.7.16
+    fixed:
+        1) 改进字符识别功能
+
 -- V1.0.0
     tools: VS2015，Qt5.10.0，Qbs>=1.10.0
     depends:

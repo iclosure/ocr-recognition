@@ -55,7 +55,7 @@ public:
             if (file.open(QIODevice::ReadWrite | QIODevice::Text)) {
                 QByteArray content = file.readAll();
                 if (!content.isEmpty()) {
-                    content = WidgetCore::replaceConfig(content, false);
+                    content = Jwt::replaceConfig(content, false);
                     file.resize(0);
                     file.write(content);
                     file.flush();
@@ -79,7 +79,7 @@ public:
                 if (file.open(QIODevice::ReadWrite | QIODevice::Text)) {
                     QByteArray content = file.readAll();
                     if (!content.isEmpty()) {
-                        content = WidgetCore::replaceConfig(content, true);
+                        content = Jwt::replaceConfig(content, true);
                         file.resize(0);
                         file.write(content);
                         file.flush();
@@ -105,7 +105,7 @@ public:
 private:
     J_DECLARE_PUBLIC(JMain)
     QSharedMemory sharedMemory;
-    J::JNotifyPtr notify;
+    JNotifyPtr notify;
     QList<SingletonReleaseCallback> callbacks;
     QString configDir;
     QString configFile;
@@ -119,7 +119,7 @@ QString JMainPrivate::appDirPath = QString();
 void JMainPrivate::init()
 {
     Q_Q(JMain);
-    notify = J::JNotifyPtr(J::JNotify::inst(QCoreApplication::applicationName(), q));
+    notify = JNotifyPtr(JNotify::inst(QCoreApplication::applicationName(), q));
     Q_ASSERT(notify != nullptr);
     //
     notify->on(QLatin1String("app.theme"), q, [=](JNEvent &event){
@@ -276,7 +276,7 @@ bool JMain::initTranslators()
     settings.setValue(QLatin1String("localeName"), localeName);
     settings.endGroup();
     //
-    result = result && WidgetCore::instance()->setLocaleName(localeName);
+    result = result && Jwt::instance()->setLocaleName(localeName);
 
     return result;
 }
@@ -493,13 +493,13 @@ MainWindow *JMain::mainWindow() const
     return d->mainWindow;
 }
 
-J::JNotifyPtr JMain::notify()
+JNotifyPtr JMain::notify()
 {
     Q_D(JMain);
     return d->notify;
 }
 
-const J::JNotifyPtr &JMain::notify() const
+const JNotifyPtr &JMain::notify() const
 {
     Q_D(const JMain);
     return d->notify;
@@ -543,7 +543,8 @@ J::ParserPtr JMain::parser(const QString &module) const
     }
 
     J::ParserPtr parser;
-    if (!jnotify->send(module + QLatin1String(".parser.inst"), qVariantFromValue(static_cast<void*>(&parser))).toBool()
+    if (!jnotify->send(module + QLatin1String(".parser.inst"),
+                       qVariantFromValue(static_cast<void*>(&parser))).toBool()
             || !parser) {
         return J::ParserPtr();
     }

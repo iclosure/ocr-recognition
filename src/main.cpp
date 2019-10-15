@@ -87,14 +87,14 @@ int main(int argc, char **argv)
                           QDir(projectDir + QLatin1String("/example")).canonicalPath());
         settings.endGroup();
         //
-        WidgetCore::cleanTempFiles();
+        //Jwt::cleanTempFiles();
         //
         if (!JMain::initTranslators()) {
             QMessageBox::warning(nullptr, QObject::tr("Warning"),
                                  QObject::tr("Initialize translators failure!"));
         }
 
-        J::initialize();
+        //J::initialize();
 
         QApplication::setApplicationDisplayName(QObject::tr("OCR-DevInfo")
                                                 + ' ' + QCoreApplication::applicationVersion());
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 
     int ret = JMain::execApp(&app);
 
-    J::uninitialize();
+    //J::uninitialize();
 
     return ret;
 }

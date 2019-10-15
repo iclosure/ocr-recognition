@@ -26,7 +26,7 @@ Project {
     DataStudioInstall {
         condition: !project.buildQuote && !qbs.targetOS.contains('darwin') //TODO [fix other platform]
         name: 'setenv-datastudio'
-        modules: ['protocore', 'protowidget']
+        modules: []
         installSOCI: false
         installEmpty: false
         installSQLite: false
@@ -52,8 +52,10 @@ Project {
                 var items = []
                 if (qbs.architecture == 'x86_64') {
                     items.push('opencv_videoio_ffmpeg411_64.dll')
+                    items.push('../x64/vc15/bin/opencv_world411.dll')
                 } else {
                     items.push('opencv_videoio_ffmpeg411.dll')
+                    //items.push('../x86/vc15/bin/opencv_world411.dll')
                 }
                 return items
             }

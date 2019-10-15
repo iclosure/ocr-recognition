@@ -26,6 +26,13 @@ Project {
         return path
     }
     readonly property path workDirectory: FileInfo.joinPaths(projectInstallRoot, projectName)
+    readonly property string archDir: {
+        if (qbs.targetOS.contains("windows")) {
+            return qbs.architecture == 'x86_64' ? 'x64' : ''
+        } else {
+            return ''
+        }
+    }
 
     references: {
         if (qbs.buildVariant == 'debug' || variantSuffix == 'd') {

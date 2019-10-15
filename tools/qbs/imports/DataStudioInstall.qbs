@@ -77,7 +77,7 @@ Product {
         id: modules_dynamic
         name: 'modules_dynamic'
         condition: datastudioExists && !isSelfDirectory || !isDSProject
-        prefix: datastudioDir + '/lib/'
+        prefix: datastudioDir + '/lib/' + project.archDir + '/'
         files: {
             var files = []
             modules.forEach(function(item){
@@ -130,7 +130,7 @@ Product {
         id: modules_generator
         name: 'modules_generator'
         condition: installGenerator && (datastudioExists && !isSelfDirectory || !isDSProject)
-        prefix: datastudioDir + '/lib/plugins/generator/'
+        prefix: datastudioDir + '/lib/' + project.archDir + '/plugins/generator/'
         files: [ '**/*.dll' ]
         excludeFiles: [ EnvUtils.excDylibFuzzy(qbs, true) ]
         fileTags: [ name + '.in' ]
@@ -146,7 +146,7 @@ Product {
         id: meta_dynamic
         name: 'meta_dynamic'
         condition: installMeta && (datastudioExists && !isSelfDirectory || !isDSProject)
-        prefix: datastudioDir + '/lib/plugins/meta/'
+        prefix: datastudioDir + '/lib/' + project.archDir + '/plugins/meta/'
         files: [ '**/*.dll', '**/qmldir', '**/*.qml', '**/*.js', '**/imports/**/*' ]
         excludeFiles: [ EnvUtils.excDylibFuzzy(qbs, true) ]
         fileTags: [ name + '.in' ]
@@ -160,7 +160,7 @@ Product {
         id: meta_library
         condition: datastudioExists && installMeta && !isSelfDirectory
         name: 'meta_library'
-        prefix: datastudioDir + '/lib/plugins/meta/'
+        prefix: datastudioDir + '/lib/' + project.archDir + '/plugins/meta/'
         files: [ '**/*.dll', '**/*.qmltypes' ]
         excludeFiles: [ EnvUtils.incDylibFuzzy(qbs, true) ]
         fileTags: [ name + '.in' ]
@@ -214,7 +214,7 @@ Product {
         id: modules_soci_dynamic
         name: 'modules_soci_dynamic'
         condition: datastudioExists && installSOCI
-        prefix: datastudioDir + '/lib/'
+        prefix: datastudioDir + '/lib/' + project.archDir + '/'
         files: [ EnvUtils.libPrefix(qbs) + 'soci_core' + EnvUtils.dylibSuffix(qbs) + '*' ]
         fileTags: [ name + '.in' ]
         qbs.install: true
@@ -262,7 +262,7 @@ Product {
         id: modules_soci
         name: 'modules_soci'
         condition: datastudioExists && !isSelfDirectory
-        prefix: datastudioDir + '/lib/'
+        prefix: datastudioDir + '/lib/' + project.archDir + '/'
         files: {
             var items = []
             if (installMySQL) {
@@ -286,7 +286,7 @@ Product {
         id: modules_soci_sql
         name: 'modules_soci_sql'
         condition: datastudioExists && !isSelfDirectory
-        prefix: datastudioDir + '/lib/plugins/soci/'
+        prefix: datastudioDir + '/lib/' + project.archDir + '/plugins/soci/'
         files: {
             var files = [], modules = []
             if (installEmpty) modules.push('soci_empty')

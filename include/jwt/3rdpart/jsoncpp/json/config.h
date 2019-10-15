@@ -37,20 +37,7 @@
 #endif
 #endif
 
-//
-#ifdef PROTOCORE_LIB
-#if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__MINGW32__)
-#   ifdef PROTOCORE_BUILD
-#       ifndef JSON_DLL_BUILD
-#           define JSON_DLL_BUILD
-#       endif
-#   else
-#       ifndef JSON_DLL
-#           define JSON_DLL
-#       endif
-#   endif // !PROTOCORE_BUILD
-#endif // _MSC_VER || ...
-#endif // PROTOCORE_LIB
+#include "../../../global.h"
 
 #ifdef JSON_IN_CPPTL
 #define JSON_API CPPTL_API

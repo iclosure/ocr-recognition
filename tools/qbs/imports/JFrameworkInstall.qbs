@@ -59,11 +59,11 @@ Product {
         id: modules_dynamic
         name: 'modules_dynamic'
         condition: jframeExists
-        prefix: jframeDir + '/lib/'
+        prefix: jframeDir + '/lib/' + project.archDir + '/'
         files: {
             var files = []
             modules.forEach(function(item){
-                files.push(EnvUtils.libPrefix(qbs) + item + EnvUtils.dylibSuffix(qbs, qbs.architecture) + '*')
+                files.push(EnvUtils.libPrefix(qbs) + item + EnvUtils.dylibSuffix(qbs) + '*')
             })
             return files
         }
@@ -82,23 +82,17 @@ Product {
             var files = []
             if (qbs.targetOS.contains('windows')) {
                 modules.forEach(function(item){
-                    if (qbs.architecture == 'x86_64') {
-                        files.push(item + '64*.lib')
-                        files.push(item + '64*.dll')
-                    } else {
-                        files.push(item + '*.lib')
-                        files.push(item + '*.dll')
-                    }
+                    files.push(item + '*.lib')
+                    files.push(item + '*.dll')
                 })
             } else {
                 modules.forEach(function(item){
-                    files.push(EnvUtils.libPrefix(qbs) + item + '*'
-                               + EnvUtils.dylibExtension(qbs))
+                    files.push(EnvUtils.libPrefix(qbs) + item + '*' + EnvUtils.dylibExtension(qbs))
                 })
             }
             return files
         }
-        excludeFiles: [ EnvUtils.incDylibFuzzy(qbs, undefined, undefined, qbs.architecture) ]
+        excludeFiles: [ EnvUtils.incDylibFuzzy(qbs) ]
         fileTags: [ name + '.in' ]
     }
 

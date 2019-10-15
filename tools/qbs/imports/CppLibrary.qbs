@@ -72,7 +72,8 @@ Library {
         }
     }
 
-    property string destinationRoot: FileInfo.joinPaths(project.sourceDirectory, 'lib', modulePath)
+    property string destinationRoot: FileInfo.joinPaths(project.sourceDirectory, 'lib',
+                                                        project.archDir, modulePath)
 
     // install
     property stringList installFileTags: {
@@ -116,6 +117,9 @@ Library {
         //
         if (qbs.targetOS.contains('windows')) {
             items.push('WIN32')
+            if (qbs.architecture == 'x86_64') {
+                items.push('_X64')
+            }
         }
         //
         if (qbs.buildVariant === 'debug') {
@@ -135,7 +139,6 @@ Library {
         condition: qbs.targetOS.contains("darwin")
         //Depends { name: "Qt.qios" }
         //Depends { name: "ib" }
-        Depends { name: "bundle" }
         // for apple
         bundle.isBundle: isBundle
         cpp.separateDebugInformation: qbs.debugInformation
@@ -216,7 +219,8 @@ Library {
                 var fullPath = EnvUtils.libFullName(product, product.targetName,
                                                     product.cpp.variantSuffix,
                                                     product.isDynamicLibrary)
-                var path = FileInfo.joinPaths(project.sourceDirectory, 'lib', product.modulePath, fullPath)
+                var path = FileInfo.joinPaths(project.sourceDirectory, 'lib', project.archDir,
+                                              product.modulePath, fullPath)
                 items.push(path)
                 return items
             }
@@ -229,7 +233,8 @@ Library {
                 var fullPath = EnvUtils.libFullName(product, product.targetName,
                                                     product.cpp.variantSuffix,
                                                     product.isDynamicLibrary)
-                var path = FileInfo.joinPaths(project.sourceDirectory, 'lib', product.modulePath, fullPath)
+                var path = FileInfo.joinPaths(project.sourceDirectory, 'lib', project.archDir,
+                                              product.modulePath, fullPath)
                 items.push(path)
                 return items
             }

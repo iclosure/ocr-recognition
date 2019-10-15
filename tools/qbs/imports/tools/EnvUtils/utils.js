@@ -182,13 +182,10 @@ function dylibExtensionFuzzy(qbs) {
     }
 }
 
-function dylibSuffix(qbs, architecture) {
+function dylibSuffix(qbs) {
     var suffix = dylibExtensionFuzzy(qbs)
     if (qbs.buildVariant === 'debug') {
         suffix = 'd' + suffix
-    }
-    if (architecture === 'x86_64') {
-        suffix = '64' + suffix
     }
     return suffix
 }
@@ -198,19 +195,13 @@ function libFullName(product, targetName, variantSuffix, isDylib) {
     return name + libExtension(product.qbs, isDylib)
 }
 
-function incDylibFuzzy(qbs, recursive, name, architecture) {
+function incDylibFuzzy(qbs, recursive, name) {
     var suffix = dylibExtensionFuzzy(qbs)
     if (qbs.buildVariant === 'debug') {
-        suffix = 'd' + suffix
+        suffix = '*d' + suffix
     } else {
-        suffix = '[^d]' + suffix
+        suffix = '*[^d]' + suffix
     }
-    if (architecture === 'x86_64') {
-        suffix = '64' + suffix
-    } else {
-        suffix = '[^(64)]' + suffix
-    }
-    suffix = '*' + suffix
     if (name) {
         suffix = name + suffix
     }

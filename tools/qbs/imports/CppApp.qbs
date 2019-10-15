@@ -37,6 +37,9 @@ CppApplication {
         //
         if (qbs.targetOS.contains('windows')) {
             items.push('WIN32')
+            if (qbs.architecture == 'x86_64') {
+                items.push('_X64')
+            }
         }
         //
         if (qbs.buildVariant === 'debug') {

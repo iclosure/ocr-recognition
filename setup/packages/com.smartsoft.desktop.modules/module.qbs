@@ -7,12 +7,11 @@ PackageProduct {
     name: 'com.smartsoft.desktop.modules'
 
     property stringList modules: [
-        'jwt', 'log4cpp', 'qwt', 'protocore', 'protowidget'
+        'jwt', 'log4cpp', 'qwt'
     ]
 
     // protocore/parser/generator
     property bool installGenerator: true
-
 
     // soci
     property bool installSOCI: true
@@ -29,7 +28,7 @@ PackageProduct {
     // plugins - soci
     Group {
         name: 'data-plugins-soci'
-        prefix: FileInfo.joinPaths(project.sourceDirectory, 'lib') + '/'
+        prefix: FileInfo.joinPaths(project.sourceDirectory, 'lib', project.archDir) + '/'
         files: {
             var items = []
             if (installSOCI) {
@@ -50,7 +49,8 @@ PackageProduct {
     // plugins - soci - sql
     Group {
         name: 'data-plugins-soci-sql'
-        prefix: FileInfo.joinPaths(project.sourceDirectory, 'lib/plugins/soci') + '/'
+        prefix: FileInfo.joinPaths(project.sourceDirectory, 'lib', project.archDir,
+                                   'plugins/soci') + '/'
         files: {
             var files = [], modules = [];
             if (installEmpty) modules.push('soci_empty')
@@ -75,13 +75,14 @@ PackageProduct {
 
     Group {
         name: 'data-modules'
-        prefix: FileInfo.joinPaths(project.sourceDirectory, 'lib') + '/'
+        prefix: FileInfo.joinPaths(project.sourceDirectory, 'lib', project.archDir) + '/'
         files: {
             var files = []
             modules.forEach(function(item){
-                  files.push(item + EnvUtils.dylibSuffix(qbs, qbs.architecture) + '*');
-              });
-            return files;
+                files.push(item + EnvUtils.dylibSuffix(qbs, qbs.architecture) + '*')
+            });
+            console.warn(files + '===========')
+            return files
         }
         qbs.install: true
         qbs.installPrefix: dataInstallPrefix
@@ -91,7 +92,8 @@ PackageProduct {
 
     Group {
         name: 'data-plugins-generator'
-        prefix: FileInfo.joinPaths(project.sourceDirectory, 'lib/plugins/generator') + '/'
+        prefix: FileInfo.joinPaths(project.sourceDirectory, 'lib', project.archDir,
+                                   'plugins/generator') + '/'
         files: {
             var items = []
             if (installGenerator) {

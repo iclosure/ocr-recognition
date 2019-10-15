@@ -12,6 +12,7 @@ namespace JChart {
 
 class ViewPrivate;
 class Chart;
+class AbstractSeries;
 
 class JWT_EXPORT View : public QWidget
 {
@@ -61,6 +62,8 @@ public:
     JChart::Chart *lastChart(JChart::Chart *except) const;
     int indexOfChart(Chart *chart);
     QList<Chart *> charts() const;
+    Chart *chartByIdentity(const QString &identity, bool fuzzy = true) const;
+    AbstractSeries *seriesByIdentity(const QString &identity, bool fuzzy = true) const;
     void focusChart(int index);
     void focusChart(int row, int column);
     void focusChart(const QString &identity);
@@ -92,7 +95,7 @@ Q_SIGNALS:
     void triggledZoomReset(JChart::Chart *chart);
     void triggledClose(JChart::Chart *chart);
     void seriesRemoved(int row, int column);
-    void trackerChanged(JChart::Chart *chart, const QPointF &pos, bool visible);
+    void trackerChanged(JChart::Chart *chart, int index, const QPointF &pos);
     void trackerMarked(JChart::Chart *chart, const QPointF &pos);
     void trackerMarkerCleared(JChart::Chart *chart);
 
@@ -133,7 +136,7 @@ protected:
 
 private slots:
     void onTriggledZoomReset(JChart::Chart *chart);
-    void onTrackerChanged(JChart::Chart *chart, const QPointF &pos, bool visible);
+    void onTrackerChanged(JChart::Chart *chart, int index, const QPointF &pos);
     void onTrackerMarked(JChart::Chart *chart, const QPointF &pos);
     void onTrackerMarkerCleared(JChart::Chart *chart);
     void onScaleDivChanged(int axisId, qreal minimum, qreal maximum);

@@ -14,8 +14,14 @@
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__MINGW32__)
 #   ifdef JWT_BUILD
 #       define JWT_EXPORT  Q_DECL_EXPORT
+#       ifndef JSON_DLL_BUILD
+#           define JSON_DLL_BUILD
+#       endif
 #   else
 #       define JWT_EXPORT  Q_DECL_IMPORT
+#       ifndef JSON_DLL
+#           define JSON_DLL
+#       endif
 #   endif // !JWT_BUILD
 #endif // _MSC_VER || ...
 #endif // JWT_LIB
@@ -227,6 +233,9 @@ public:
                                    const QVariant &defaultValue = QVariant());
     static QString settingsGroupPrefix(const QString prefix = QString());
 
+    static QByteArray &replaceConfig(QByteArray &content, bool reverse);
+    static QString &replaceConfig(QString &content, bool reverse);
+
     static QVariant readStore(const QString &key, const QVariant &defaultValue = QVariant());
     template<typename T> inline
     static T readStore(const QString &key, const QVariant &defaultValue = QVariant())
@@ -239,7 +248,7 @@ public:
 
 private:
     explicit Jwt(QObject *parent = nullptr);
-    ~Jwt();
+    ~Jwt() J_OVERRIDE;
 
 private:
     Q_DISABLE_COPY(Jwt)

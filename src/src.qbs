@@ -53,12 +53,10 @@ WidgetApp {
     }
 
     Depends { name: 'Qt.concurrent' }
-    //Depends { name: 'Qt.axcontainer' }
+    Depends { name: 'Qt.axcontainer' }
     Depends { name: 'Qt.printsupport' }
     Depends { name: 'module.jwt' }
     Depends { name: 'module.log4cpp' }
-    Depends { name: 'module.protocore' }
-    Depends { name: 'module.protowidget' }
 
     Group {
         name: 'Headers'
