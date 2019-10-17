@@ -11,7 +11,8 @@ class OCRMgr : public QObject
 public:
     bool init();
 
-    QString test(const QString &filePath);
+    QStringList test(const QString &filePath, const QSize &size,
+                     QPixmap *pmSource = nullptr, QPixmap *pmBinary = nullptr);
 
 signals:
 

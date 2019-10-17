@@ -559,6 +559,11 @@ QStringList JMain::modules()
     return _modules;
 }
 
+QString JMain::tessdataDir()
+{
+    return QCoreApplication::applicationDirPath().append(QLatin1String("/../tessdata"));
+}
+
 void JMain::setTheme(const QString &text)
 {
     const QString previous = theme();

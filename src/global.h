@@ -80,6 +80,8 @@ public:
 
     static QStringList modules();
 
+    static QString tessdataDir();
+
 signals:
     void themeChanged(const QString &currnt, const QString &previous);
     void printerNameChanged(const QString &currnt, const QString &previous);

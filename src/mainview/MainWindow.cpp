@@ -9,7 +9,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : JMainWindow(parent)
 {
-    resize(920, 550);
+    resize(1100, 550);
 
     JTitleBar *titleBar = this->titleBar();
     titleBar->setButtonVisible(JTitleBar::ButtonMenu, false);

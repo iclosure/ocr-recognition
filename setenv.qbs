@@ -79,5 +79,13 @@ Project {
             qbs.installPrefix: project.projectName
             qbs.installDir: 'bin'
         }
+        Group {
+            name: 'tessdata'
+            prefix: project.sourceDirectory + '/tools/tessdata/'
+            files: [ '*.traineddata' ]
+            qbs.install: true
+            qbs.installPrefix: project.projectName
+            qbs.installDir: 'tessdata'
+        }
     }
 }

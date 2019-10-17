@@ -81,7 +81,6 @@ PackageProduct {
             modules.forEach(function(item){
                 files.push(item + EnvUtils.dylibSuffix(qbs, qbs.architecture) + '*')
             });
-            console.warn(files + '===========')
             return files
         }
         qbs.install: true

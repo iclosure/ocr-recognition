@@ -70,7 +70,7 @@
 <context>
     <name>HomeWindow</name>
     <message>
-        <location filename="../../module/home/HomeWindow.cpp" line="92"/>
+        <location filename="../../module/home/HomeWindow.cpp" line="132"/>
         <source>Device informations</source>
         <translation>设备信息</translation>
     </message>
@@ -78,7 +78,7 @@
 <context>
     <name>LabelImage</name>
     <message>
-        <location filename="../../module/home/HomeWindow.cpp" line="31"/>
+        <location filename="../../module/home/HomeWindow.cpp" line="46"/>
         <source>Select an image</source>
         <translation>选择一张照片</translation>
     </message>

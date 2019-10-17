@@ -37,6 +37,8 @@ public:
     QWidget *titleBar() const;
     void setTitleBar(QWidget *widget);
 
+    virtual QSize minimumSizeHint() const override;
+
 Q_SIGNALS:
     void titleShadowEnabledChanged(bool enabled);
     void titleBlurRadiusChanged(qreal blurRadius);

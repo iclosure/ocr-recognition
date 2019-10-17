@@ -13,10 +13,14 @@ public:
     explicit LabelImage(QWidget *parent = nullptr);
     ~LabelImage() J_OVERRIDE;
 
+    bool isClickable() const;
+
 signals:
+    void clickableChanged(bool enabled);
     void filePathChanged(const QString &filePath);
 
 public slots:
+    void setClickable(bool enabled);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -26,6 +30,7 @@ protected:
 
 private:
     QString filePath_;
+    bool clickable_;
 };
 
 // class HomeWidget
@@ -49,7 +54,8 @@ public slots:
 private:
     Q_DISABLE_COPY(HomeWindow)
     JSplitter *splitter_;
-    LabelImage *labelImage_;
+    LabelImage *labelImSource_;
+    LabelImage *labelImBinary_;
     QPlainTextEdit *editDevInfo_;
 };
 

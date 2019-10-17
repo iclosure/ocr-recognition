@@ -9,13 +9,15 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QPainter>
+#include <QDebug>
 
 // class LabelImage
 
 LabelImage::LabelImage(QWidget *parent)
     : QLabel(parent)
+    , clickable_(true)
 {
-
+    setMinimumWidth(10);
 }
 
 LabelImage::~LabelImage()
@@ -23,9 +25,22 @@ LabelImage::~LabelImage()
 
 }
 
+bool LabelImage::isClickable() const
+{
+    return clickable_;
+}
+
+void LabelImage::setClickable(bool enabled)
+{
+    clickable_ = enabled;
+}
+
 void LabelImage::mousePressEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event)
+    if (!clickable_) {
+        QLabel::mousePressEvent(event);
+        return;
+    }
 
     const QString filePath = QFileDialog::getOpenFileName(
                 this, tr("Select an image"), QString(),
@@ -34,6 +49,8 @@ void LabelImage::mousePressEvent(QMouseEvent *event)
         return;
     }
 
+    setPixmap(QPixmap(filePath));
+
     filePath_ = filePath;
 
     Q_EMIT filePathChanged(filePath_);
@@ -41,23 +58,32 @@ void LabelImage::mousePressEvent(QMouseEvent *event)
 
 void LabelImage::enterEvent(QEvent *event)
 {
-    Q_UNUSED(event)
+    if (!clickable_) {
+        QLabel::enterEvent(event);
+        return;
+    }
+
     setCursor(Qt::PointingHandCursor);
 }
 
 void LabelImage::leaveEvent(QEvent *event)
 {
-    Q_UNUSED(event)
+    if (!clickable_) {
+        QLabel::leaveEvent(event);
+        return;
+    }
+
     unsetCursor();
 }
 
 void LabelImage::paintEvent(QPaintEvent *)
 {
-    if (filePath_.isEmpty() || !QFile::exists(filePath_)) {
+    const QPixmap *_pixmap = this->pixmap();
+    if (!_pixmap) {
         return;
     }
 
-    QPixmap pixmap(filePath_);
+    QPixmap pixmap = _pixmap->copy();
     QSize size = this->size();
     size = size.boundedTo(pixmap.size());
     pixmap = pixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -81,15 +107,30 @@ HomeWindow::HomeWindow(QWidget *parent)
     layoutMain->setContentsMargins(0, 0, 0, 0);
     layoutMain->setSpacing(0);
 
-    splitter_ = new JSplitter({1.5, 1}, this);
+    splitter_ = new JSplitter({2, 1}, this);
     splitter_->setObjectName("home.splitter");
+    splitter_->setOpaqueResize(true);
+    splitter_->setChildrenCollapsible(false);
     layoutMain->addWidget(splitter_);
 
-    labelImage_ = new LabelImage(this);
-    labelImage_->setObjectName(QLatin1String("_image_"));
-    splitter_->addWidget(labelImage_);
+    QWidget *widgetLeft = new QWidget(this);
+    splitter_->addWidget(widgetLeft);
+
+    QHBoxLayout *layoutLeft = new QHBoxLayout(widgetLeft);
+    layoutLeft->setContentsMargins(3, 3, 3, 3);
+    layoutLeft->setSpacing(3);
+
+    labelImSource_ = new LabelImage(this);
+    labelImSource_->setObjectName(QLatin1String("_image_"));
+    layoutLeft->addWidget(labelImSource_);
+
+    labelImBinary_ = new LabelImage(this);
+    labelImBinary_->setObjectName(QLatin1String("_image_"));
+    labelImBinary_->setClickable(false);
+    layoutLeft->addWidget(labelImBinary_);
 
     JGroupBox *groupRight = new JGroupBox(tr("Device informations"), this);
+    groupRight->setMinimumWidth(150);
     splitter_->addWidget(groupRight);
 
     QVBoxLayout *layoutRight = new QVBoxLayout(groupRight);
@@ -99,9 +140,20 @@ HomeWindow::HomeWindow(QWidget *parent)
     editDevInfo_->setReadOnly(true);
     layoutRight->addWidget(editDevInfo_);
 
-    connect(labelImage_, &LabelImage::filePathChanged, this, [=](const QString &filePath){
-        const QString text = OCRMgr::instance()->test(filePath);
+    connect(labelImSource_, &LabelImage::filePathChanged, this, [=](const QString &filePath){
+        setCursor(Qt::BusyCursor);
+
+        QPixmap pmSource, pmBinary;
+
+        const QStringList sections = OCRMgr::instance()->test(filePath, QSize(30, 12), &pmSource, &pmBinary);
+
+        labelImSource_->setPixmap(pmSource);
+        labelImBinary_->setPixmap(pmBinary);
+
+        const QString text = sections.join(QLatin1String("\n--------------------------\n"));
         editDevInfo_->setPlainText(text);
+
+        unsetCursor();
     });
 }
 
