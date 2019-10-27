@@ -9,7 +9,15 @@ Project {
     QtInstall {
         condition: qbs.targetOS.contains('windows') //TODO [fix other platform]
         name: 'setenv-qt'
-        moduleGeneral: base.concat([ 'Concurrent' ])
+        moduleGeneral: base.concat([
+                                       'Concurrent',
+                                       'PrintSupport',
+                                       'Network',
+                                       'OpenGL',
+                                       'Multimedia',
+                                       'MultimediaWidgets'
+                                   ])
+        modulePlugins: base.concat(['mediaservice'])
         moduleTranslations: ['qt_zh_CN.qm', 'qt_help_zh_CN.qm']
         useOpenGL: false
     }

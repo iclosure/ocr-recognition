@@ -70,17 +70,22 @@
 <context>
     <name>HomeWindow</name>
     <message>
-        <location filename="../../module/home/HomeWindow.cpp" line="132"/>
+        <location filename="../../module/home/HomeWindow.cpp" line="37"/>
         <source>Device informations</source>
         <translation>设备信息</translation>
     </message>
 </context>
 <context>
-    <name>LabelImage</name>
+    <name>ImageLabel</name>
     <message>
-        <location filename="../../module/home/HomeWindow.cpp" line="46"/>
+        <location filename="../../module/home/ImageLabel.cpp" line="43"/>
         <source>Select an image</source>
         <translation>选择一张照片</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/ImageLabel.cpp" line="100"/>
+        <source>Click here to select a image to show.</source>
+        <translation>点击此区域选择一幅图像显示。</translation>
     </message>
 </context>
 <context>
@@ -112,7 +117,7 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../mainview/MainWindow.cpp" line="32"/>
+        <location filename="../../mainview/MainWindow.cpp" line="29"/>
         <source>SerialPort configuration</source>
         <translation>串口配置</translation>
     </message>
@@ -133,6 +138,19 @@
         <location filename="../../main.cpp" line="99"/>
         <source>OCR-DevInfo</source>
         <translation>设备信息识别软件</translation>
+    </message>
+</context>
+<context>
+    <name>SourceView</name>
+    <message>
+        <location filename="../../module/home/SourceView.cpp" line="37"/>
+        <source>Capture</source>
+        <translation>识别图像</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SourceView.cpp" line="42"/>
+        <source>Switch View</source>
+        <translation>切换视图</translation>
     </message>
 </context>
 <context>

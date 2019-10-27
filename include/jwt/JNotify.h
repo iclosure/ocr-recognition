@@ -1,5 +1,5 @@
-#ifndef PROTOWIDGET_JNOTIFY_H
-#define PROTOWIDGET_JNOTIFY_H
+#ifndef JNOTIFY_H
+#define JNOTIFY_H
 
 #include "global.h"
 #include <functional>
@@ -57,7 +57,7 @@ private:
 // class JNotify
 
 class JNotify;
-typedef ::std::shared_ptr<JNotify> JNotifyPtr;
+typedef std::shared_ptr<JNotify> JNotifyPtr;
 class JNotifyPrivate;
 
 class JWT_EXPORT JNotify : public QObject
@@ -100,4 +100,4 @@ private:
     J_DECLARE_PRIVATE(JNotify)
 };
 
-#endif // PROTOWIDGET_JNOTIFY_H
+#endif // JNOTIFY_H

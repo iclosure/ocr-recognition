@@ -1,83 +1,9 @@
 #include "OCRMgr.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/types_c.h>
 #include <tesseract/baseapi.h>
 #include <tesseract/renderer.h>
 #include <tesseract/strngs.h>
 #include <QCoreApplication>
 #include <QDebug>
-
-QImage cvMatToQImage(const cv::Mat &inMat)
-{
-    switch (inMat.type())
-    {
-    // 8-bit, 4 channel
-    case CV_8UC4:
-    {
-        QImage image( inMat.data,
-                      inMat.cols, inMat.rows,
-                      static_cast<int>(inMat.step),
-                      QImage::Format_ARGB32 );
-
-        return image;
-    }
-
-        // 8-bit, 3 channel
-    case CV_8UC3:
-    {
-        QImage image( inMat.data,
-                      inMat.cols, inMat.rows,
-                      static_cast<int>(inMat.step),
-                      QImage::Format_RGB888 );
-
-        return image.rgbSwapped();
-    }
-
-        // 8-bit, 1 channel
-    case CV_8UC1:
-    {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
-        QImage image( inMat.data,
-                      inMat.cols, inMat.rows,
-                      static_cast<int>(inMat.step),
-                      QImage::Format_Grayscale8 );
-#else
-        static QVector<QRgb>  sColorTable;
-
-        // only create our color table the first time
-        if ( sColorTable.isEmpty() )
-        {
-            sColorTable.resize( 256 );
-
-            for ( int i = 0; i < 256; ++i )
-            {
-                sColorTable[i] = qRgb( i, i, i );
-            }
-        }
-
-        QImage image( inMat.data,
-                      inMat.cols, inMat.rows,
-                      static_cast<int>(inMat.step),
-                      QImage::Format_Indexed8 );
-
-        image.setColorTable( sColorTable );
-#endif
-
-        return image;
-    }
-
-    default:
-        qWarning() << "ASM::cvMatToQImage() - cv::Mat image type not handled in switch:" << inMat.type();
-        break;
-    }
-
-    return QImage();
-}
-
-QPixmap cvMatToQPixmap(const cv::Mat &inMat)
-{
-    return QPixmap::fromImage(cvMatToQImage(inMat));
-}
 
 // class OCRMgrPrivate
 
@@ -123,27 +49,152 @@ bool OCRMgr::init()
     return true;
 }
 
-QStringList OCRMgr::test(const QString &filePath, const QSize &size,
-                         QPixmap *pmSource, QPixmap *pmBinary)
+void OCRMgr::qImageToCvMat(const QImage &image, cv::OutputArray &matOut)
 {
-#if 0
-    const QString imagePath = QCoreApplication::applicationDirPath()
-            .append(QLatin1String("/image/5.png"));
-#else
-    const QString imagePath = filePath;
-#endif
-    const std::string sImagePath = imagePath.toStdString();
+    switch(image.format()) {
+    case QImage::Format_Invalid:
+    {
+        cv::Mat empty;
+        empty.copyTo(matOut);
+        break;
+    }
+    case QImage::Format_RGB32:
+    {
+        cv::Mat view(image.height(), image.width(), CV_8UC4,
+                     static_cast<void*>(const_cast<uchar*>(image.constBits())),
+                     size_t(image.bytesPerLine()));
+        view.copyTo(matOut);
+        break;
+    }
+    case QImage::Format_RGB888:
+    {
+        cv::Mat view(image.height(), image.width(), CV_8UC3,
+                     static_cast<void*>(const_cast<uchar*>(image.constBits())),
+                     size_t(image.bytesPerLine()));
+        cvtColor(view, matOut, cv::COLOR_RGB2BGR);
+        break;
+    }
+    default:
+    {
+        QImage conv = image.convertToFormat(QImage::Format_ARGB32);
+        cv::Mat view(conv.height(), conv.width(), CV_8UC4,
+                     static_cast<void*>(const_cast<uchar*>(image.constBits())),
+                     size_t(image.bytesPerLine()));
+        view.copyTo(matOut);
+        break;
+    }
+    }
+}
 
-    // Load image
-    cv::Mat imSource = cv::imread(sImagePath);
-    if (imSource.empty()) {
-        qCritical().noquote() << QLatin1String("Cannot open source image!");
+QImage OCRMgr::cvMatToQImage(const cv::Mat &inMat)
+{
+    switch (inMat.type()) {
+    case CV_8UC4:       // 8-bit, 4 channel
+    {
+        QImage image(inMat.data, inMat.cols, inMat.rows, static_cast<int>(inMat.step),
+                     QImage::Format_ARGB32);
+        return image;
+    }
+    case CV_8UC3:       // 8-bit, 3 channel
+    {
+        QImage image(inMat.data, inMat.cols, inMat.rows, static_cast<int>(inMat.step),
+                     QImage::Format_RGB888);
+        return image.rgbSwapped();
+    }
+    case CV_8UC1:       // 8-bit, 1 channel
+    {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+        QImage image(inMat.data, inMat.cols, inMat.rows, static_cast<int>(inMat.step),
+                     QImage::Format_Grayscale8);
+#else
+        static QVector<QRgb> sColorTable;
+
+        // only create our color table the first time
+        if (sColorTable.isEmpty()) {
+            sColorTable.resize(256);
+
+            for (int i = 0; i < 256; ++i) {
+                sColorTable[i] = qRgb(i, i, i);
+            }
+        }
+
+        QImage image(inMat.data, inMat.cols, inMat.rows, static_cast<int>(inMat.step),
+                     QImage::Format_Indexed8);
+        image.setColorTable(sColorTable);
+#endif
+        return image;
+    }
+    default:
+        qWarning() << "ASM::cvMatToQImage() - cv::Mat image type not handled in switch:" << inMat.type();
+        break;
+    }
+
+    return QImage();
+}
+
+QPixmap OCRMgr::cvMatToQPixmap(const cv::Mat &inMat)
+{
+    return QPixmap::fromImage(cvMatToQImage(inMat));
+}
+
+QStringList OCRMgr::test(const cv::Mat &imBinary,
+                         const std::vector<std::vector<cv::Point> > &contours,
+                         const QSize &size)
+{
+    if (imBinary.empty()) {
         return QStringList();
     }
-#if 0
-    cv::Mat imSourceSmall;
-    cv::resize(imSource, imSourceSmall, cv::Size(), 0.5, 0.5, cv::INTER_AREA);
-    imSource = imSourceSmall;
+
+    // Pass it to Tesseract API
+    tesseract::TessBaseAPI tess;
+    tess.Init(JMain::tessdataDir().toLocal8Bit().data(), "eng", tesseract::OEM_DEFAULT);
+    tess.SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
+    tess.SetImage(reinterpret_cast<uchar*>(imBinary.data), imBinary.cols, imBinary.rows,
+                  1, imBinary.cols);
+    tess.SetSourceResolution(300);
+
+    QStringList sections;
+
+    for (auto citer = contours.crbegin(); citer != contours.crend(); ++citer) {
+        const auto &contour = *citer;
+        //
+        const cv::Rect rect = cv::boundingRect(contour);
+        //qCritical().noquote() << rect.width << rect.height;
+        if ((rect.width >= imBinary.cols)
+                || (rect.height >= size.width() * 2)) {
+            continue;
+        }
+        //
+        tess.SetRectangle(rect.x, rect.y, rect.width, rect.height);
+        QString text = QString::fromUtf8(tess.GetUTF8Text()).trimmed();
+        // remove charactor ',' and ' '
+        text.replace(QLatin1Char(','), QLatin1Char('.'));
+        text.remove(QLatin1Char(' '));
+
+        sections.append(text);
+    }
+
+    tess.Clear();
+    tess.End();
+
+    return sections;
+}
+
+QStringList OCRMgr::test(cv::Mat imSource, const QSize &size,
+                         QPixmap *pmSource, QPixmap *pmBinary)
+{
+    if (imSource.empty()) {
+        return QStringList();
+    }
+
+    QSize newSize = size;
+    const int factor = 3;
+
+#if 1
+    cv::Mat imSourceScaled;
+    cv::resize(imSource, imSourceScaled, cv::Size(), factor, factor, cv::INTER_LINEAR);
+    imSourceScaled.copyTo(imSource);
+    newSize *= 2;
 #endif
 #if 0
     //
@@ -165,7 +216,7 @@ QStringList OCRMgr::test(const QString &filePath, const QSize &size,
 
     //
     cv::Mat imNoMarker, imBinary;
-    cv::threshold(imGray, imBinary, 100, 255, cv::THRESH_BINARY);
+    cv::threshold(imGray, imBinary, 90, 255, cv::THRESH_BINARY);
 #if 0
     cv::Mat emKernel0 = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
     cv::Mat imDilate;
@@ -174,16 +225,16 @@ QStringList OCRMgr::test(const QString &filePath, const QSize &size,
 #endif
 #if 1
     // open / close
-    cv::Mat emKernelOpenClose = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(17, 3));
+    cv::Mat emKernelOpenClose = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(22 * factor, 6 * factor));
     cv::Mat imOpened;
     cv::morphologyEx(imBinary, imOpened, cv::MORPH_OPEN, emKernelOpenClose);
     cv::Mat imClosed;
     cv::morphologyEx(imOpened, imClosed, cv::MORPH_CLOSE, emKernelOpenClose);
 #endif
-    std::vector< std::vector<cv::Point> > contours;
+    std::vector<std::vector<cv::Point> > contours;
     //
 #if 1
-    cv::Mat emKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(size.width(), size.height()));
+    cv::Mat emKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(newSize.width(), newSize.height()));
     cv::Mat imErode;
     cv::erode(imClosed, imErode, emKernel);
     cv::findContours(imErode, contours, cv::RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
@@ -200,9 +251,21 @@ QStringList OCRMgr::test(const QString &filePath, const QSize &size,
     tesseract::TessBaseAPI tess;
     tess.Init(JMain::tessdataDir().toLocal8Bit().data(), "eng", tesseract::OEM_DEFAULT);
     tess.SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
-    tess.SetSourceResolution(70);
-    tess.SetImage(reinterpret_cast<uchar*>(imBinary.data), imBinary.cols, imBinary.rows,
-                  1, imBinary.cols);
+#if 0
+    cv::Mat copiedBinary;
+    imBinary.copyTo(copiedBinary);
+    const int width = copiedBinary.cols;
+    const int height = copiedBinary.rows;
+    const double aspect = double(width) / double(height);
+    cv::resize(copiedBinary, copiedBinary, cv::Size2d(),
+               aspect * 2, aspect * 2, cv::INTER_LINEAR);
+    tess.SetImage(reinterpret_cast<uchar*>(copiedBinary.data), copiedBinary.cols, copiedBinary.rows,
+                  1, copiedBinary.cols);
+#else
+    tess.SetImage(reinterpret_cast<uchar*>(imBinary.data), imBinary.cols,
+                  imSourceScaled.rows, 1, imBinary.cols);
+#endif
+    tess.SetSourceResolution(96);
 
     //qCritical().noquote() << "source:" << imSource.cols << imSource.rows;
 
@@ -215,7 +278,7 @@ QStringList OCRMgr::test(const QString &filePath, const QSize &size,
         const cv::Rect rect = cv::boundingRect(contour);
         //qCritical().noquote() << rect.width << rect.height;
         if ((rect.width >= imBinary.cols)
-                || (rect.height >= size.width() * 2)) {
+                || (rect.height >= newSize.width() * 2)) {
             continue;
         }
         //
@@ -260,4 +323,40 @@ QStringList OCRMgr::test(const QString &filePath, const QSize &size,
     tess.End();
 
     return sections;
+}
+
+QStringList OCRMgr::test(const QString &filePath, const QSize &size,
+                         QPixmap *pmSource, QPixmap *pmBinary)
+{
+
+#if 0
+    const QString imagePath = QCoreApplication::applicationDirPath()
+            .append(QLatin1String("/image/5.png"));
+#else
+    const QString imagePath = filePath;
+#endif
+    const std::string sImagePath = imagePath.toStdString();
+
+    // Load image
+    cv::Mat imSource = cv::imread(sImagePath);
+    if (imSource.empty()) {
+        qCritical().noquote() << QLatin1String("Cannot open source image!");
+        return QStringList();
+    }
+
+    return test(imSource, size, pmSource, pmBinary);
+}
+
+QStringList OCRMgr::test(const QImage &image, const QSize &size,
+                         QPixmap *pmSource, QPixmap *pmBinary)
+{
+    if (image.isNull()) {
+        return QStringList();
+    }
+
+    cv::Mat imSource;
+
+    qImageToCvMat(image, imSource);
+
+    return test(imSource, size, pmSource, pmBinary);
 }

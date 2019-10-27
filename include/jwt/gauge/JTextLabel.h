@@ -33,6 +33,8 @@ public:
     QString bottomText() const;
     int bottomHeight() const;
 
+    virtual QSize minimumSizeHint() const override;
+
 Q_SIGNALS:
     void textChanged(const QString &value);
     void text2Changed(const QString &value);

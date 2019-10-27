@@ -1,9 +1,9 @@
 ﻿#ifndef JWINDWMAPI_H
 #define JWINDWMAPI_H
 
+#include "../global.h"
 #include <qwindowdefs.h>
 #include <QMargins>
-#include "../global.h"
 
 class JWinDwmapiPrivate;
 

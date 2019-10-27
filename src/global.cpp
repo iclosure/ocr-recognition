@@ -1,6 +1,5 @@
 ﻿#include "global.h"
 #include "common/Logging.h"
-//#include "RegisterWidget.h"
 #include "SplashWidget.h"
 #include "mainview/MainWindow.h"
 #include "jwt/JLangManager.h"

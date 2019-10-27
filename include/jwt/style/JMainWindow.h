@@ -1,8 +1,8 @@
 #ifndef JMAINWINDOW_H
 #define JMAINWINDOW_H
 
-#include <QMainWindow>
 #include "../global.h"
+#include <QMainWindow>
 
 // class JMainWindow
 
@@ -12,10 +12,14 @@ class QAbstractNativeEventFilter;
 
 class JWT_EXPORT JMainWindow : public QMainWindow
 {
-	Q_OBJECT
+    Q_OBJECT
     Q_PROPERTY(bool resizable READ resizable WRITE setResizable NOTIFY resizableChanged)
 public:
     explicit JMainWindow(QWidget *parent = nullptr);
+    explicit JMainWindow(QWidget *parent, bool frameless,
+                         const QSize &size = QSize(), bool autoState = true);
+    explicit JMainWindow(QWidget *parent, const QSize &size,
+                         bool frameless = true, bool autoState = true);
     ~JMainWindow() J_OVERRIDE;
 
     bool resizable() const;

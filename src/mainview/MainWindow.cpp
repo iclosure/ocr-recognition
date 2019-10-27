@@ -7,16 +7,13 @@
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
-    : JMainWindow(parent)
+    : JMainWindow(parent, QSize(1100, 550))
 {
-    resize(1100, 550);
-
     JTitleBar *titleBar = this->titleBar();
     titleBar->setButtonVisible(JTitleBar::ButtonMenu, false);
     titleBar->setButtonVisible(JTitleBar::ButtonMin, true);
     //titleBar->setButtonVisible(JTitleBar::ButtonMax, false);
 
-    setObjectName(metaObject()->className());
     setDockOptions(QMainWindow::AnimatedDocks
                    | QMainWindow::AllowNestedDocks
                    | QMainWindow::AllowTabbedDocks);
@@ -35,8 +32,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    Jwt::saveWidgetState(this);
-
     centralWidget_->clearView();
 }
 
@@ -44,11 +39,7 @@ bool MainWindow::init()
 {
     bool result = true;
 
-    setCenter();
-
     result = result && centralWidget_->init();
-
-    Jwt::restoreWidgetState(this);
 
     return result;
 }

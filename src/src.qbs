@@ -52,11 +52,14 @@ WidgetApp {
         return items
     }
 
-    Depends { name: 'Qt.concurrent' }
-    Depends { name: 'Qt.axcontainer' }
-    Depends { name: 'Qt.printsupport' }
-    Depends { name: 'module.jwt' }
+    Depends {
+        name: 'Qt';
+        submodules: [
+            'concurrent', 'axcontainer', 'printsupport', 'multimedia', 'multimediawidgets'
+        ]
+    }
     Depends { name: 'module.log4cpp' }
+    Depends { name: 'module.jwt' }
 
     Group {
         name: 'Headers'

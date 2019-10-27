@@ -1,14 +1,19 @@
 #ifndef JWT_GLOBAL_H
 #define JWT_GLOBAL_H
 
+#ifndef J_NO_QT
+
 #include <qglobal.h>
 #include <QString>
 #include <QFontMetrics>
+#include <QEvent>
+
+#endif  // J_NO_QT
 
 // JWT_VERSION is (major << 16) + (minor << 8) + patch.
 
-#define JWT_VERSION       0x000001
-#define JWT_VERSION_STR   "0.0.1"
+#define JWT_VERSION       0x010000
+#define JWT_VERSION_STR   "1.0.0"
 
 #ifdef JWT_LIB
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__MINGW32__)
@@ -171,7 +176,62 @@ typedef void(*SingletonReleaseCallback)();
 #define J_OVERRIDE override
 #endif
 
+#ifndef J_NO_QT
+
+#ifndef J_TYPEDEF_QT_SHAREDPTR
+#define J_TYPEDEF_QT_SHAREDPTR(_class_) \
+    class _class_; \
+    typedef QSharedPointer<_class_> _class_ ## Ptr; \
+    typedef QList<_class_ ## Ptr> _class_ ## PtrArray;
+#endif
+
+#ifndef J_VARIANT_FROM_VOID
+#define J_VARIANT_FROM_VOID
+
+#include <QVariant>
+
+template<typename T> inline
+T *jVariantFromVoid(const QVariant &value)
+{ return reinterpret_cast<T *>(value.value<void *>()); }
+
+#endif
+
+// handlescope
+#ifndef J_HANDLE_SCOPE
+#define J_HANDLE_SCOPE
+template<typename T> struct JHandleScope { std::shared_ptr<T> ptr; };
+#endif
+
+// weakscope
+#ifndef J_WEAK_SCOPE
+#define J_WEAK_SCOPE
+template<typename T> struct JWeakScope { std::weak_ptr<T> ptr; };
+#endif
+
+template<typename T>
+inline ::std::shared_ptr<T> handlescope_cast(const QVariant &variant)
+{
+    JHandleScope<T> *handleScope = jVariantFromVoid<JHandleScope<T> >(variant);
+    if (handleScope) {
+        return handleScope->ptr;
+    }
+    return nullptr;
+}
+
+template<typename T>
+inline ::std::weak_ptr<T> weakscope_cast(const QVariant &variant)
+{
+    JWeakScope<T> *weakScope = jVariantFromVoid<JWeakScope<T> >(variant);
+    if (weakScope) {
+        return weakScope->ptr;
+    }
+    return nullptr;
+}
+
+#endif  // J_NO_QT
+
 namespace jwt {
+
 static const double jDoubleEpsion = 1E-6;
 static const float jFDoubleEpsion = 1E-6f;
 
@@ -205,6 +265,51 @@ inline bool fLessOrEqual(double a, double b)
 inline bool fLessOrEqual(float a, float b)
 { return ((a - b < -jFDoubleEpsion) || (a - b >= -jFDoubleEpsion && a - b <= jFDoubleEpsion)) ? true : false; }
 
+#ifndef J_NO_QT
+
+#ifndef J_DELETE_QOBJECT
+#define J_DELETE_QOBJECT
+
+inline void jdelete_qobject(QObject *object)
+{
+    delete object;
+}
+
+#endif // J_DELETE_QOBJECT
+
+#ifndef J_ENUM_CUSTOM_EVENT
+#define J_ENUM_CUSTOM_EVENT
+
+enum CustomEvent {
+    Event_Callback = QEvent::User + 100,
+    Event_StateMachine,
+    Event_SetProperty,
+    Event_ProtocolFeedback,
+
+    Event_User = QEvent::User + 500
+};
+
+class JWT_EXPORT JCallbackEvent : public QEvent
+{
+public:
+    typedef std::function<void(const QVariantList &)> Caller;
+
+    explicit JCallbackEvent(Caller callback, const QVariantList &arguments);
+    ~JCallbackEvent() J_OVERRIDE;
+
+    bool isValid() const;
+    void execute();
+
+private:
+    Q_DISABLE_COPY(JCallbackEvent)
+    Caller callback_;
+    QVariantList args_;
+};
+
+#endif  // J_ENUM_CUSTOM_EVENT
+
+#endif  // J_NO_QT
+
 }   // end of namespace jwt
 
 // - class Jwt -
@@ -218,7 +323,19 @@ class QLocale;
 
 class JWT_EXPORT Jwt : public QObject
 {
+    Q_OBJECT
 public:
+    enum TimeSpec {
+        TimeSpec_HourMin,
+        TimeSpec_MinuteMin,
+        TimeSpec_SecondMin,
+        TimeSpec_MSecondMin
+    };
+    Q_ENUM(TimeSpec)
+
+    typedef std::function<void(const QVariantList &/*args*/)> AsyncCaller;
+    typedef std::function<void(const QVariantList &/*args*/)> DelayCaller;
+
     void init();
 
     bool setLocaleName(const QString &localeName = QString());
@@ -229,7 +346,7 @@ public:
     static qreal fontWidth(const QString &text, const QFontMetricsF &fontMetrics);
 
     static void saveWidgetState(QWidget *widget, const QString prefix = QString());
-    static void restoreWidgetState(QWidget *widget, const QString prefix = QString(),
+    static bool restoreWidgetState(QWidget *widget, const QString prefix = QString(),
                                    const QVariant &defaultValue = QVariant());
     static QString settingsGroupPrefix(const QString prefix = QString());
 
@@ -245,6 +362,21 @@ public:
     static void clearStore(const QString &key = QString());
 
     static void sortVersions(QStringList &versions);
+
+    static void cleanTempFiles();
+    static void clearTempSettings();
+
+    void startAwait();
+    void stopAwait();
+    void asyncCall(AsyncCaller callback, const QVariantList &args = QVariantList());
+    void delayCall(DelayCaller callback, const QVariantList &args = QVariantList(),
+                   qint64 msecs = 10000);
+    void cancelDelayCall();
+
+    static QString timeToStringByMsec(qint64 msecs, Jwt::TimeSpec spec = TimeSpec_MSecondMin);
+
+protected:
+    void customEvent(QEvent *event) override;
 
 private:
     explicit Jwt(QObject *parent = nullptr);

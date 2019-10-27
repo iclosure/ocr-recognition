@@ -1,8 +1,8 @@
 #ifndef JTITLEBAR_H
 #define JTITLEBAR_H
 
-#include <QPushButton>
 #include "../global.h"
+#include <QPushButton>
 #include <functional>
 
 // class JSystemButton

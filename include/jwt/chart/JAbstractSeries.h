@@ -123,6 +123,11 @@ public:
     QObjectUserData *userData() const;
     void setUserData(QObjectUserData *data);
 
+    int closestPointX(qreal x) const;
+    int closestPointY(qreal y) const;
+    QPoint closestPoint(const QPointF &point) const;
+    QRectF visualBoundingRect(int indexMin = -1, int indexMax = -1) const;
+
 private:
     Q_DISABLE_COPY(AbstractSeries)
     J_DECLARE_PRIVATE(AbstractSeries)

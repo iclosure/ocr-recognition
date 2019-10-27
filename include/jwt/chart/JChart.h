@@ -124,7 +124,8 @@ enum ChartActionFlag {
     Chart_ExportAction = 0x0200,
     Chart_RemoveChartAction = 0x0400,
     Chart_SettingsAction = 0x0800,
-    Chart_HelpAction = 0x1000,
+    Chart_StatisticsAction = 0x1000,
+    Chart_HelpAction = 0x2000,
     Chart_AllActions = 0xffff,
 
     Chart_Zoom = Chart_ZoomInAction | Chart_ZoomOutAction | Chart_ResetZoomAction,
@@ -277,10 +278,10 @@ public:
     QWidget *bufferView() const;
 
     //
-    ChartActionFlags chartActionFlags() const;
-    bool testChartActionFlag(ChartActionFlag flag) const;
-    void setChartActionFlag(ChartActionFlag flag, bool on = true);
-    void setChartActionFlags(ChartActionFlags flags);
+    int chartActionFlags() const;
+    bool testChartActionFlag(int flag) const;
+    void setChartActionFlag(int flag, bool on = true);
+    void setChartActionFlags(int flags);
 
     void setAxisLabelAlignment(int axisId, Qt::Alignment alignment);
     void setAxisLabelRotation( int axisId, double rotation);
@@ -295,6 +296,7 @@ public:
     int axisMaxMajor(int axisId) const;
 
 Q_SIGNALS:
+    void zoomed(const QRectF &rect);
     void zoomerColorChanged(const QColor &color);
 
     void axisIntervalChanged(int axisId, qreal minimum, qreal maximum);
@@ -309,6 +311,8 @@ Q_SIGNALS:
     void defShiftCountChanged(int count);
     void defaultShiftTimeZoneChanged(qreal value);
     void colorPaletteChanged();
+
+    void seriesAttached(AbstractSeries *series, bool on);
 
 public Q_SLOTS:
     void setZoomerColor(const QColor &color);

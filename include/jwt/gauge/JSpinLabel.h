@@ -16,6 +16,7 @@ class JWT_EXPORT JSpinLabel : public JFormFrame
     Q_PROPERTY(QString suffix READ suffix WRITE setSuffix)
     Q_PROPERTY(int minimum READ minimum WRITE setMinimum)
     Q_PROPERTY(int maximum READ maximum WRITE setMaximum)
+    Q_PROPERTY(int singleStep READ singleStep WRITE setSingleStep)
     Q_PROPERTY(int value READ value WRITE setValue NOTIFY valueChanged)
 public:
     explicit JSpinLabel(QWidget *parent = nullptr);
@@ -28,6 +29,7 @@ public:
     QString suffix() const;
     int minimum() const;
     int maximum() const;
+    int singleStep() const;
     int value() const;
 
 Q_SIGNALS:
@@ -39,6 +41,7 @@ public Q_SLOTS:
     void setMinimum(int value);
     void setMaximum(int value);
     void setRange(int minimum, int maximum);
+    void setSingleStep(int value);
     void setValue(int value);
 
 private:
@@ -58,6 +61,7 @@ class JWT_EXPORT JDoubleSpinLabel : public JFormFrame
     Q_PROPERTY(qreal minimum READ minimum WRITE setMinimum)
     Q_PROPERTY(qreal maximum READ maximum WRITE setMaximum)
     Q_PROPERTY(int decimals READ decimals WRITE setDecimals)
+    Q_PROPERTY(qreal singleStep READ singleStep WRITE setSingleStep)
     Q_PROPERTY(qreal value READ value WRITE setValue NOTIFY valueChanged)
 public:
     explicit JDoubleSpinLabel(QWidget *parent = nullptr);
@@ -71,6 +75,7 @@ public:
     qreal minimum() const;
     qreal maximum() const;
     int decimals() const;
+    qreal singleStep() const;
     qreal value() const;
 
 Q_SIGNALS:
@@ -83,6 +88,7 @@ public Q_SLOTS:
     void setMaximum(qreal value);
     void setRange(qreal minimum, qreal maximum);
     void setDecimals(int value);
+    void setSingleStep(qreal value);
     void setValue(qreal value);
 
 private:
@@ -101,6 +107,7 @@ class JWT_EXPORT JLargeSpinLabel : public JFormFrame
     Q_PROPERTY(QString suffix READ suffix WRITE setSuffix)
     Q_PROPERTY(qreal minimum READ minimum WRITE setMinimum)
     Q_PROPERTY(qreal maximum READ maximum WRITE setMaximum)
+    Q_PROPERTY(qulonglong singleStep READ singleStep WRITE setSingleStep)
     Q_PROPERTY(qulonglong value READ value WRITE setValue NOTIFY valueChanged)
 public:
     explicit JLargeSpinLabel(QWidget *parent = nullptr);
@@ -113,6 +120,7 @@ public:
     QString suffix() const;
     qulonglong minimum() const;
     qulonglong maximum() const;
+    qulonglong singleStep() const;
     qulonglong value() const;
 
 Q_SIGNALS:
@@ -124,6 +132,7 @@ public Q_SLOTS:
     void setMinimum(qulonglong value);
     void setMaximum(qulonglong value);
     void setRange(qulonglong minimum, qulonglong maximum);
+    void setSingleStep(qulonglong value);
     void setValue(qulonglong value);
 
 private:

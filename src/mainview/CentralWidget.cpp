@@ -29,6 +29,7 @@ bool CentralWidget::init()
     bool result = true;
 
     //
+    result = result && homeWindow_->init();
 
     return result;
 }

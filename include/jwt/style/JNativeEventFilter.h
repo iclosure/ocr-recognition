@@ -1,9 +1,9 @@
 #ifndef JNATIVEEVENTFILTER_H
 #define JNATIVEEVENTFILTER_H
 
+#include "../global.h"
 #include <QWidget>
 #include <QAbstractNativeEventFilter>
-#include "../global.h"
 #include <QWindow>
 
 // class JNativeEventFilter

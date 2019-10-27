@@ -15,10 +15,6 @@ class Parser;
 typedef std::shared_ptr<Parser> ParserPtr;
 }
 
-class JNEvent;
-class JNotify;
-typedef std::shared_ptr<JNotify> JNotifyPtr;
-
 // class JMain
 
 class QWidget;
