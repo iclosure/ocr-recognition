@@ -11,16 +11,17 @@ PackageProduct {
     property bool installGlobal: true
     property bool installSystem32Api: true
     property bool installMsvcRuntime: true
+    property stringList globalFiles: [
+        'VERSION',
+        'LICENSE',
+        'README.md'
+    ]
 
     Group {
         name: 'data-global'
         condition: installGlobal
         prefix: project.sourceDirectory + '/'
-        files: [
-            'LICENSE',
-            'README.md',
-            'VERSION'
-        ]
+        files: globalFiles
         qbs.install: true
         qbs.installPrefix: dataInstallPrefix
     }

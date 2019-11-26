@@ -5,8 +5,7 @@ ModuleBase {
     moduleName: 'PCI-Dask'
 
     cpp.defines: [ 'PCIS_DASK_LIB' ]
-    cpp.includePaths: [ project.sourceDirectory + '/include/PCIS-DASK' ]
-    cpp.libraryPaths: [ project.sourceDirectory + '/lib/' + project.archDir ]
+    cpp.libraryPaths: [ project.sourceDirectory + '/lib/PCIS-DASK/' + project.archDir ]
 
     Properties {
         condition: qbs.targetOS.contains('windows')

@@ -46,8 +46,6 @@ Library {
     readonly property path includePath: FileInfo.joinPaths(project.sourceDirectory,
                                                            'include', modulePath, namePath)
 
-    readonly property path precompPath: path + '/common'
-
     // translation
     property path langPath: sourceDirectory + '/resource/lang'
     property pathList noRecursivePaths: []
@@ -102,7 +100,6 @@ Library {
     desc.version: version
     desc.productName: name
 
-    cpp.includePaths: base.concat([ precompPath ])
     cpp.defines: {
         var items = base
         var upperName = product.name.toUpperCase()

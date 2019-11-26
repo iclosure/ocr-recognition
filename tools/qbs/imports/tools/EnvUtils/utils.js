@@ -56,14 +56,20 @@ function projectDir(project, projectName, envName) {
             return path
         }
     }
-    // from 3rdpart
-    path = FileInfo.joinPaths(project.sourceDirectory, '..', '3rdpart', projectName)
+    // from /..?
+    path = FileInfo.joinPaths(project.sourceDirectory, '..', projectName)
     path = validatePath(path, projectName)
     if (path !== undefined) {
         return path
     }
     // from ../..?
     path = FileInfo.joinPaths(project.sourceDirectory, '..', '..', projectName)
+    path = validatePath(path, projectName)
+    if (path !== undefined) {
+        return path
+    }
+    // from 3rdpart
+    path = FileInfo.joinPaths(project.sourceDirectory, '..', '3rdpart', projectName)
     path = validatePath(path, projectName)
     if (path !== undefined) {
         return path
@@ -76,12 +82,6 @@ function projectDir(project, projectName, envName) {
     }
     // from sourceDirectory
     path = validatePath(project.sourceDirectory, projectName)
-    if (path !== undefined) {
-        return path
-    }
-    // from /..?
-    path = FileInfo.joinPaths(project.sourceDirectory, '..', projectName)
-    path = validatePath(path, projectName)
     if (path !== undefined) {
         return path
     }

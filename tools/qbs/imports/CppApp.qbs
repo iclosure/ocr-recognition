@@ -6,12 +6,10 @@ import tools.EnvUtils
 CppApplication {
     version: '1.0.0'
 
-    // module
-    readonly property path precompPath: path + '/common'
-
     property var pairInstallNames: undefined
+    property bool linkQtCore: false
 
-    Depends { name: 'Qt.core'; cpp.link: false }
+    Depends { name: 'Qt.core'; cpp.link: linkQtCore }
     Depends { name: 'Qt.qminimal'; condition: Qt.core.staticBuild }
     Depends { name: 'desc'; required: false }
     Depends { name: 'setenv'; required: false; cpp.link: false }
@@ -48,9 +46,10 @@ CppApplication {
         } else {
             items.push('NDEBUG')
         }
+        // build version
+        items.push('BUILD_VERSION="' + project.buildVersion + '"')
         return items
     }
-    cpp.includePaths: base.concat([precompPath])
     cpp.variantSuffix: project.variantSuffix
     cpp.separateDebugInformation: qbs.debugInformation
 

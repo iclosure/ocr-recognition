@@ -11,6 +11,7 @@ Project {
     property string projectName: 'app'
     property string projectDisplayName: 'App'
     property string version: '1.0.0'
+    property int buildVersion: 1
     property string variantSuffix: ''
     property string installRoot: ''
     readonly property bool isSetup: true

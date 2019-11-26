@@ -10,6 +10,7 @@ PackageProduct {
     type: base.concat([ 'qt.conf.out' ])
     property bool useSvg: false
     property bool useOpenGL: false
+    property bool useDBus: true
 
     property bool generateQtConf: true
     property stringList module3rdpart: {
@@ -28,6 +29,9 @@ PackageProduct {
         }
         if (useOpenGL) {
             items.push('OpenGL')
+        }
+        if (useDBus) {
+            items.push('DBus')
         }
         return items
     }

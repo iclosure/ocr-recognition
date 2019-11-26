@@ -12,11 +12,13 @@ Project {
 
     property string projectName: 'app'
     property string projectDisplayName: 'App'
-    property string version: probeVersion.version
+    property string version: '1.0.0'
+    property int buildVersion: 1
     property bool buildQuote: false
     readonly property int versionMajor: parseInt(version.split('.')[0])
     readonly property int versionMinor: parseInt(version.split('.')[1])
     readonly property int versionPatch: parseInt(version.split('.')[2])
+    readonly property int versionBuild: parseInt(version.split('.')[3])
     readonly property string variantSuffix: qbs.buildVariant == 'debug' ? 'd' : ''
     readonly property path qtdir: FileInfo.fromWindowsSeparators(Environment.getEnv('Qt5_DIR'))
     readonly property path installRoot: qbs.installRoot
@@ -28,14 +30,22 @@ Project {
             return ''
         }
     }
+    property stringList globalFiles: [
+        'VERSION',
+        'CHANGE',
+        'LICENSE',
+        'README.md'
+    ]
 
     references: {
-        var items = [
-                    sourceDirectory + '/src/src.qbs',
-                    sourceDirectory + '/tools/tools.qbs'
-                ]
+        var items = []
         // config
         var filePath = sourceDirectory + '/config/config.qbs'
+        if (File.exists(filePath)) {
+            items.push(filePath)
+        }
+        // src
+        filePath = sourceDirectory + '/src/src.qbs'
         if (File.exists(filePath)) {
             items.push(filePath)
         }
@@ -49,17 +59,30 @@ Project {
         if (File.exists(filePath)) {
             items.push(filePath)
         }
+        // tools
+        filePath = sourceDirectory + '/tools/tools.qbs'
+        if (File.exists(filePath)) {
+            items.push(filePath)
+        }
         return items
     }
 
     Probe {
         id: probeVersion
-        property string version: '0.0.0'
+        readonly property string projectVersion: version + '.' + buildVersion
         readonly property path projectDirectory: sourceDirectory
         configure: {
             var filePath = FileInfo.joinPaths(projectDirectory, 'VERSION')
-            var file = new TextFile(filePath, TextFile.ReadOnly)
-            version = file.readAll().trim()
+            if (!File.exists(filePath)) {
+                filePath = FileInfo.joinPaths(projectDirectory, 'VERSION.txt')
+                if (!File.exists(filePath)) {
+                    found = false
+                    return
+                }
+            }
+            var file = new TextFile(filePath, TextFile.WriteOnly)
+            file.truncate()
+            file.write(projectVersion)
             file.close()
             found = true
         }
@@ -67,15 +90,12 @@ Project {
 
     Product {
         name: 'global'
+        type: base.concat(['version.out'])
+
         Group {
             name: 'files'
             prefix: project.sourceDirectory + '/'
-            files: [
-                'CHANGE',
-                'LICENSE',
-                'README.md',
-                'VERSION'
-            ]
+            files: root.globalFiles
             qbs.install: true
             qbs.installPrefix: project.projectName
         }

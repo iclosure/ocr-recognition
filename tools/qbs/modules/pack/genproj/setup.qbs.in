@@ -8,6 +8,7 @@ I.JSetup {
     projectName: '@PROJECT_NAME@'
     projectDisplayName: '@PROJECT_DISPLAY_NAME@'
     version: '@VERSION@'
+    buildVersion: @BUILD_VERSION@
     variantSuffix: '@VARIANT_SUFFIX@'
     installRoot: '@PROJECT_INSTALL_ROOT@'
 }

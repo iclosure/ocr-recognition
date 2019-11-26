@@ -24,7 +24,7 @@ Product {
         return items
     }
     property stringList moduleGeneral: [
-        'Core', 'Gui', 'Widgets',
+        'Core', 'Gui', 'Widgets', 'DBus'
     ]
     property stringList modulePlugins: [
         'bearer', 'iconengines', 'imageformats', 'platforms', 'printsupport', 'translations',

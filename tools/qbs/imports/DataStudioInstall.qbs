@@ -32,6 +32,8 @@ Product {
     property bool installPostgreSQL: installSOCIAll
     property bool installDB2: installSOCIAll
     property bool installFireBird: installSOCIAll
+    // plugin-xplane
+    property bool installXPLM: false
 
     // modules - headers
 
@@ -225,7 +227,7 @@ Product {
     Group {
         id: modules_soci_library
         name: 'modules_soci_library'
-        condition: datastudioExists && !isSelfDirectory && installSOCI
+        condition: datastudioExists && installSOCI && !isSelfDirectory
         prefix: modules_soci_dynamic.prefix
         files: {
             var files = []
