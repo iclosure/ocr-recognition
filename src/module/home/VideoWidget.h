@@ -30,9 +30,16 @@ public:
 
     QImage imageCaptured() const;
     void setImageCaptured(const QImage &image);
+    QImage clipedImageCaptured(const QImage &image) const;
 
     QSize areaSize() const;
     void setAreaSize(const QSize &size);
+
+    QSize clipedSize() const;
+    void setClipedSize(const QSize &size);
+
+    QSize resolution() const;
+    void setResolution(const QSize &resolution);
 
     const cv::Mat &binaryImage() const;
     void setBinaryImage(cv::Mat image);
@@ -55,6 +62,7 @@ private:
     QImage imageCaptured_;
     cv::Mat binaryImage_;
     QSize areaSize_;
+    QSize clipedSize_;
 };
 
 #endif // VIDEOWIDGET_H

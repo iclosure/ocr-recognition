@@ -29,6 +29,8 @@ public:
     void setBuffer(const uchar *buffer, size_t bufferSize, int bufferStep, bool update = true);
     void setAttributes(uchar xSize, uchar ySize, int xOffset, int yOffset, bool update = true);
 
+    bool testBit(int dataIndex) const;
+
 private:
     Q_DISABLE_COPY(BitSeries)
     J_DECLARE_PRIVATE(BitSeries)

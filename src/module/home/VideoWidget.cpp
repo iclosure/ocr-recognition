@@ -33,9 +33,13 @@ bool VideoWidget::init()
 #if 1
     QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
     foreach (const QCameraInfo &cameraInfo, cameras) {
-        const QString name = cameraInfo.deviceName();
-        //if (cameraInfo.deviceName() == QLatin1String("mycamera")) {
+        //const QString name = cameraInfo.deviceName();
+        //const QString description = cameraInfo.description();
+#if 1
+        if (cameraInfo.description() == QLatin1String("aoni webcam A25")) {
+#else
         if (true) { //TODO
+#endif
             camera_ = new QCamera(cameraInfo);
             break;
         }
@@ -49,6 +53,12 @@ bool VideoWidget::init()
 #endif
 
     cameraImageCapture_ = new QCameraImageCapture(camera_, this);
+
+    QImageEncoderSettings encodingSettings = cameraImageCapture_->encodingSettings();
+    encodingSettings.setResolution(1920, 1080);
+    //encodingSettings.setResolution(500, 900);
+    encodingSettings.setQuality(QMultimedia::VeryHighQuality);
+    cameraImageCapture_->setEncodingSettings(encodingSettings);
 
     camera_->setViewfinder(this);
 #if 0
@@ -111,6 +121,23 @@ void VideoWidget::setImageCaptured(const QImage &image)
     update();
 }
 
+QImage VideoWidget::clipedImageCaptured(const QImage &image) const
+{
+    if (clipedSize_.isValid()) {
+        const int imageWidth = image.width();
+        const int imageHeight = image.height();
+        const int clipedWidth = clipedSize_.width();
+        const int clipedHeight = clipedSize_.height();
+        if (imageWidth > clipedWidth && imageHeight > clipedHeight) {
+            return image.copy((imageWidth - clipedSize_.width()) / 2,
+                              (imageHeight - clipedSize_.height()) / 2,
+                              clipedSize_.width(), clipedSize_.height());
+        }
+    }
+
+    return image;
+}
+
 QSize VideoWidget::areaSize() const
 {
     return areaSize_;
@@ -121,6 +148,38 @@ void VideoWidget::setAreaSize(const QSize &size)
     if (size != areaSize_) {
         areaSize_ = size;
         update();
+    }
+}
+
+QSize VideoWidget::clipedSize() const
+{
+    return clipedSize_;
+}
+
+void VideoWidget::setClipedSize(const QSize &size)
+{
+    if (size != areaSize_) {
+        clipedSize_ = size;
+        update();
+    }
+}
+
+QSize VideoWidget::resolution() const
+{
+    if (cameraImageCapture_) {
+        QImageEncoderSettings encodingSettings = cameraImageCapture_->encodingSettings();
+        return encodingSettings.resolution();
+    } else {
+        return QSize();
+    }
+}
+
+void VideoWidget::setResolution(const QSize &resolution)
+{
+    if (cameraImageCapture_) {
+        QImageEncoderSettings encodingSettings = cameraImageCapture_->encodingSettings();
+        encodingSettings.setResolution(resolution);
+        cameraImageCapture_->setEncodingSettings(encodingSettings);
     }
 }
 
@@ -178,20 +237,35 @@ void VideoWidget::paintEvent(QPaintEvent *event)
         return;
     }
 
-    QImage image(imageCaptured_.width(), imageCaptured_.height(), QImage::Format_RGBA8888);
-    QPainter painterImage(&image);
-    painterImage.setPen(QPen(QColor(255, 0, 0), 2));
+    QImageEncoderSettings encodingSettings = cameraImageCapture_->encodingSettings();
+    const QSize resolution = encodingSettings.resolution();
+    const int imageWidth = resolution.width();
+    const int imageHeight = resolution.height();
+    if (resolution.isEmpty()) {
+        return;
+    }
 
+    QImage image(resolution.width(), resolution.height(), QImage::Format_RGBA8888);
+    QPainter painterImage(&image);
+    // rectange
+    const int x = (imageWidth - clipedSize_.width()) / 2;
+    const int y = (imageHeight - clipedSize_.height()) / 2;
+    if (clipedSize_.isValid() && imageWidth > clipedSize_.width()
+            && imageHeight > clipedSize_.height()) {
+        painterImage.setPen(QPen(QColor(0, 0, 255), 8));
+        painterImage.drawRect(QRect(x, y, clipedSize_.width(), clipedSize_.height()));
+    }
+    // contours
+    painterImage.setPen(QPen(QColor(255, 0, 0), 4));
     for (auto citer = contours_.crbegin(); citer != contours_.crend(); ++citer) {
         const auto &contour = *citer;
         //
         const cv::Rect rect = cv::boundingRect(contour);
         //qCritical().noquote() << rect.width << rect.height;
-        if ((rect.width >= binaryImage_.cols)
-                || (rect.height >= areaSize_.width() * 2)) {
+        if ((rect.width >= binaryImage_.cols) || (rect.height >= areaSize_.width() * 2)) {
             continue;
         }
-        painterImage.drawRect(rect.x, rect.y, rect.width, rect.height);
+        painterImage.drawRect(x + rect.x, y + rect.y, rect.width, rect.height);
     }
 
     const QRect rect = this->rect();

@@ -78,12 +78,12 @@
 <context>
     <name>ImageLabel</name>
     <message>
-        <location filename="../../module/home/ImageLabel.cpp" line="43"/>
+        <location filename="../../module/home/ImageLabel.cpp" line="47"/>
         <source>Select an image</source>
         <translation>选择一张照片</translation>
     </message>
     <message>
-        <location filename="../../module/home/ImageLabel.cpp" line="100"/>
+        <location filename="../../module/home/ImageLabel.cpp" line="106"/>
         <source>Click here to select a image to show.</source>
         <translation>点击此区域选择一幅图像显示。</translation>
     </message>
@@ -143,12 +143,12 @@
 <context>
     <name>SourceView</name>
     <message>
-        <location filename="../../module/home/SourceView.cpp" line="37"/>
+        <location filename="../../module/home/SourceView.cpp" line="39"/>
         <source>Capture</source>
         <translation>识别图像</translation>
     </message>
     <message>
-        <location filename="../../module/home/SourceView.cpp" line="42"/>
+        <location filename="../../module/home/SourceView.cpp" line="44"/>
         <source>Switch View</source>
         <translation>切换视图</translation>
     </message>

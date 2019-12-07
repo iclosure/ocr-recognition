@@ -117,18 +117,28 @@ public:
     void setButtonEnabled(ButtonType button, bool enabled = true);
     void setButtonsEnabled(ButtonTypes buttons);
 
-    void addLeftWidget(const QString &identity, QWidget *widget);
-    void addRightWidget(const QString &identity, QWidget *widget);
+    bool addLeftWidget(const QString &identity, QWidget *widget);
+    bool insertLeftWidget(int index, const QString &identity, QWidget *widget);
+    bool addRightWidget(const QString &identity, QWidget *widget);
+    bool insertRightWidget(int index, const QString &identity, QWidget *widget);
     JSystemButton *addLeftButton(const QString &identity, const QIcon &icon, ButtonCaller triggered = nullptr,
                                  const QSize &iconSize = QSize(12, 12), bool sync = true);
+    JSystemButton *insertLeftButton(int index, const QString &identity, const QIcon &icon,
+                                    ButtonCaller triggered = nullptr, const QSize &iconSize = QSize(12, 12),
+                                    bool sync = true);
     JSystemButton *addRightButton(const QString &identity, const QIcon &icon, ButtonCaller triggered = nullptr,
                                   const QSize &iconSize = QSize(12, 12), bool sync = true);
+    JSystemButton *insertRightButton(int index, const QString &identity, const QIcon &icon,
+                                     ButtonCaller triggered = nullptr, const QSize &iconSize = QSize(12, 12),
+                                     bool sync = true);
     void removeWidget(const QString &identity);
     void setButtonIcon(const QString &identity, const QIcon &icon);
     bool isWidgetVisible(const QString &identity) const;
     bool containsWidget(const QString &identity) const;
 
-signals:
+    void updateFlags(Qt::WindowFlags f);
+
+Q_SIGNALS:
     void bkColorChanged(const QColor &color);
     void titleChanged(const QString &text);
     void titleColorChanged(const QColor &color);
@@ -137,7 +147,7 @@ signals:
     void menuTrigglered(const QPoint &pos);
     void buttonTriggered(const QString &identity, bool checked = false);
 
-public slots:
+public Q_SLOTS:
     void setBkColor(const QColor &color);
     void setTitle(const QString &text);
     void setTitleColor(const QColor &color);

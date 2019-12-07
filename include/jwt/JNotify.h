@@ -70,6 +70,8 @@ public:
 
     static JNotify *inst(const QString &name, QObject *parent = nullptr);
 
+    QString name() const;
+
     Q_INVOKABLE void on(const QString &channel, JNotifyCallback callback, bool sync = true);
     Q_INVOKABLE void on(const QString &channel, QObject *receiver, JNotifyCallback callback, bool sync = true);
     Q_INVOKABLE void once(const QString &channel, JNotifyCallback callback, bool sync = true);
@@ -84,6 +86,14 @@ public:
     Q_INVOKABLE void un(QObject *receiver, const QString &channel);
     Q_INVOKABLE void clear();
 
+    // for inter-process communication
+    bool isIPCValid() const;
+    bool registerIPC();
+    void unregisterIPC();
+    QVariant sendData(const QString &domain, const QVariant &data, qint64 pid = -1,
+                      int timeout = -1);
+    void postData(const QString &domain, const QVariant &data, qint64 pid = -1);
+
 Q_SIGNALS:
 
 public Q_SLOTS:
@@ -93,6 +103,7 @@ protected:
 
 public:
     explicit JNotify(QObject *parent = nullptr);
+    explicit JNotify(const QString &name, QObject *parent = nullptr);
     ~JNotify() J_OVERRIDE;
 
 private:

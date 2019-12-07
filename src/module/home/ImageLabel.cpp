@@ -2,6 +2,7 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QPainter>
+#include <QSettings>
 
 // class ImageLabel
 
@@ -39,12 +40,17 @@ void ImageLabel::mousePressEvent(QMouseEvent *event)
         return;
     }
 
+    const QString sourceDirKey(QLatin1String("home/source/sourceDir"));
+    const QString sourceDir = Jwt::readStore<QString>(sourceDirKey);
+
     const QString filePath = QFileDialog::getOpenFileName(
-                this, tr("Select an image"), QDir::currentPath(),
+                this, tr("Select an image"), sourceDir,
                 QLatin1String("Image file (*.png *.jpg)"));
     if (filePath.isEmpty()) {
         return;
     }
+
+    Jwt::writeStore(sourceDirKey, QFileInfo(filePath).absolutePath());
 
     setPixmap(QPixmap(filePath));
 

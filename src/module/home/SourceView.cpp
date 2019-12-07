@@ -23,6 +23,8 @@ SourceView::SourceView(QWidget *parent)
     layoutMain_->addWidget(stackedWidget_);
 
     videoWidget_ = new VideoWidget(this);
+    videoWidget_->setClipedSize(QSize(480, 800));
+    //videoWidget_->setResolution(QSize(480, 800));
     stackedWidget_->addWidget(videoWidget_);
 
     imageLabel_ = new ImageLabel(this);
@@ -65,7 +67,7 @@ SourceView::SourceView(QWidget *parent)
     connect(videoWidget_, &VideoWidget::captured, this, [=](const QImage &image){
         const QImage imageCaptured = videoWidget_->imageCaptured();
         bool isFirst = imageCaptured.isNull();
-        videoWidget_->setImageCaptured(image);
+        videoWidget_->setImageCaptured(videoWidget_->clipedImageCaptured(image));
         updateBoundRect();
         if (isFirst) {
             //Q_EMIT captured(image);
@@ -198,6 +200,8 @@ bool SourceView::updateBoundRect()
         return false;
     }
 
+    // rectange (480, 800)
+
     cv::Mat imSource;
 
     OCRMgr::qImageToCvMat(imageCaptured, imSource);
@@ -235,6 +239,11 @@ bool SourceView::updateBoundRect()
     //
     cv::Mat imNoMarker, imBinary;
     cv::threshold(imGray, imBinary, 120, 255, cv::THRESH_BINARY);
+
+    // remove invalid line
+    if (!OCRMgr::removeInvalidLine(imBinary)) {
+        //
+    }
 
     videoWidget_->setBinaryImage(imBinary);     // save
 

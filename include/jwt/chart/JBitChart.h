@@ -16,6 +16,11 @@ public:
     explicit BitChart(QWidget *parent = nullptr);
     virtual ~BitChart() J_OVERRIDE;
 
+    static int bitmapStepSizeHalf();
+    static int bitmapStepSize();
+    static int bitmapDeltaYHalf();
+    static int bitmapDeltaY();
+
     QRectF &boundingRect();
     virtual QVector<QPointF> *data();
 
@@ -32,10 +37,12 @@ public:
     void setBitMask(int offset, bool on);
     bool testBitMask(int offset) const;
     void setBitsTitle(const QStringList &texts);
+    void setBitsTitle(const QMap<int, QString> &texts);
 
     virtual void updateScale(JChart::Axis axisId) override;
     void updateScaleDraw(JChart::Axis axisId, bool align, int labelLength = -1) override;
 
+    virtual AbstractSeries *addBitSeries(int index, int yOffset, int maskOffset);
     virtual AbstractSeries *addSeries(AbstractSeries *series) override;
     void removeSeries(int index) override;
     void removeSeries(AbstractSeries *series) override;

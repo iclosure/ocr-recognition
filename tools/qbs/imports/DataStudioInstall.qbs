@@ -11,6 +11,7 @@ Product {
     condition: !qbs.targetOS.contains('android')
 
     Depends { name: 'cpp' }
+    Depends { name: 'module.soci' }
 
     readonly property path datastudioDir: EnvUtils.datastudioDir(project)
     readonly property bool datastudioExists: !!datastudioDir
@@ -25,7 +26,7 @@ Product {
     property bool installSOCI: false
     property bool installSOCIAll: false
     property bool installEmpty: installSOCI || installSOCIAll
-    property bool installSQLite: installSOCI || installSOCIAll
+    property bool installSQLite3: installSOCI || installSOCIAll
     property bool installMySQL: installSOCI || installSOCIAll
     property bool installODBC: installSOCI || installSOCIAll
     property bool installOracle: installSOCIAll
@@ -287,18 +288,34 @@ Product {
     Group {
         id: modules_soci_sql
         name: 'modules_soci_sql'
-        condition: datastudioExists && !isSelfDirectory
+        condition: datastudioExists
         prefix: datastudioDir + '/lib/' + project.archDir + '/plugins/soci/'
         files: {
             var files = [], modules = []
-            if (installEmpty) modules.push('soci_empty')
-            if (installSQLite) modules.push('soci_sqlite3')
-            if (installMySQL) modules.push('soci_mysql')
-            if (installODBC) modules.push('soci_odbc')
-            if (installOracle) modules.push('soci_oracle')
-            if (installPostgreSQL) modules.push('soci_postgresql')
-            if (installDB2) modules.push('soci_db2')
-            if (installFireBird) modules.push('soci_firebird')
+            if (installEmpty && !module.soci.EMPTY_PRO_VALID) {
+                modules.push('soci_empty')
+            }
+            if (installSQLite3 && !module.soci.SQLITE3_PRO_VALID) {
+                modules.push('soci_sqlite3')
+            }
+            if (installMySQL && !module.soci.MYSQL_PRO_VALID) {
+                modules.push('soci_mysql')
+            }
+            if (installODBC && !module.soci.ODBC_PRO_VALID) {
+                modules.push('soci_odbc')
+            }
+            if (installOracle && !module.soci.ORACLE_PRO_VALID) {
+                modules.push('soci_oracle')
+            }
+            if (installPostgreSQL && !module.soci.POSTGRESQL_PRO_VALID) {
+                modules.push('soci_postgresql')
+            }
+            if (installDB2 && !module.soci.DB2_PRO_VALID) {
+                modules.push('soci_db2')
+            }
+            if (installFireBird && !module.soci.FIREBIRD_PRO_VALID) {
+                modules.push('soci_firebird')
+            }
             modules.forEach(function(item){
                 files.push(EnvUtils.libPrefix(qbs) + item + '*' + EnvUtils.dylibExtension(qbs) + '*')
             })

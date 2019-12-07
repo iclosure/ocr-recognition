@@ -216,7 +216,12 @@ QStringList OCRMgr::test(cv::Mat imSource, const QSize &size,
 
     //
     cv::Mat imNoMarker, imBinary;
-    cv::threshold(imGray, imBinary, 90, 255, cv::THRESH_BINARY);
+    cv::threshold(imGray, imBinary, 130, 255, cv::THRESH_BINARY);
+
+    if (!removeInvalidLine(imBinary)) {
+        return QStringList();
+    }
+
 #if 0
     cv::Mat emKernel0 = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
     cv::Mat imDilate;
@@ -225,7 +230,7 @@ QStringList OCRMgr::test(cv::Mat imSource, const QSize &size,
 #endif
 #if 1
     // open / close
-    cv::Mat emKernelOpenClose = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(22 * factor, 6 * factor));
+    cv::Mat emKernelOpenClose = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(17 * factor, 3 * factor));
     cv::Mat imOpened;
     cv::morphologyEx(imBinary, imOpened, cv::MORPH_OPEN, emKernelOpenClose);
     cv::Mat imClosed;
@@ -359,4 +364,35 @@ QStringList OCRMgr::test(const QImage &image, const QSize &size,
     qImageToCvMat(image, imSource);
 
     return test(imSource, size, pmSource, pmBinary);
+}
+
+bool OCRMgr::removeInvalidLine(cv::Mat &imBinary)
+{
+    int a,k,m;
+    for (int i = 0;i < imBinary.rows; i++) {
+        uchar *data = imBinary.ptr<uchar>(i);
+        k =0;
+        for (int j= 0;j < imBinary.cols; j++)
+        {
+            a = data[j];
+            if (a == 0)
+            {
+                k++ ;
+            }
+            else
+            {
+                k = 0;
+            }
+            if(k > imBinary.cols/8)
+            {
+                for (int m= 0;m < imBinary.cols; m++)
+                {
+                    data[m] = 255;
+                }
+                j = imBinary.rows;
+            }
+        }
+    }
+
+    return true;
 }

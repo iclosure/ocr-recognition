@@ -37,7 +37,7 @@ Project {
         modules: []
         installSOCI: false
         installEmpty: false
-        installSQLite: false
+        installSQLite3: false
         installMySQL: false
         installODBC: false
     }

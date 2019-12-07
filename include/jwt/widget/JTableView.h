@@ -168,6 +168,16 @@ public:
     void setCurrentItem(QStandardItem *item);
     void setCurrentCell(int row, int column);
 
+    void sortItems(int column, Qt::SortOrder order = Qt::AscendingOrder);
+    void setSortingEnabled(bool enable);
+    bool isSortingEnabled() const;
+
+    void editItem(QStandardItem *item);
+    void openPersistentEditor(QStandardItem *item);
+    void closePersistentEditor(QStandardItem *item);
+    bool isPersistentEditorOpen(QStandardItem *item) const;
+    void commitPersistentEditor();
+
     QWidget *cellWidgetAt(const QPoint &point) const;
     QWidget *cellWidget(int row, int column) const;
     void setCellWidget(int row, int column, QWidget *widget);

@@ -27,6 +27,8 @@ public:
     QStringList test(const QImage &image, const QSize &size,
                      QPixmap *pmSource = nullptr, QPixmap *pmBinary = nullptr);
 
+    static bool removeInvalidLine(cv::Mat &imBinary);
+
 Q_SIGNALS:
 
 public Q_SLOTS:

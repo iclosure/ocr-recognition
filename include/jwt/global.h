@@ -19,14 +19,8 @@
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__MINGW32__)
 #   ifdef JWT_BUILD
 #       define JWT_EXPORT  Q_DECL_EXPORT
-#       ifndef JSON_DLL_BUILD
-#           define JSON_DLL_BUILD
-#       endif
 #   else
 #       define JWT_EXPORT  Q_DECL_IMPORT
-#       ifndef JSON_DLL
-#           define JSON_DLL
-#       endif
 #   endif // !JWT_BUILD
 #endif // _MSC_VER || ...
 #endif // JWT_LIB
@@ -362,6 +356,7 @@ public:
     static void clearStore(const QString &key = QString());
 
     static void sortVersions(QStringList &versions);
+    static int compareVersion(const QString &version1, const QString &version2);
 
     static void cleanTempFiles();
     static void clearTempSettings();

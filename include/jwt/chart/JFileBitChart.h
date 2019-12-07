@@ -22,6 +22,8 @@ public:
 
     void updateScale(JChart::Axis axisId) override;
 
+    AbstractSeries *addBitSeries(int index, int yOffset, int maskOffset) override;
+
     void setBuffer(const uchar *buffer, size_t bufferSize, int bufferStep, bool update = true);
     void setAttributes(uchar xSize, uchar ySize, int xOffset, int yOffset, bool update = true);
 
