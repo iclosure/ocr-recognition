@@ -2,6 +2,7 @@
 #include "ImageLabel.h"
 #include "jwt/widget/JRoundButton.h"
 #include "common/OCRMgr.h"
+#include "SettingsView.h"
 #include "VideoWidget.h"
 #include <QCamera>
 #include <QCameraImageCapture>
@@ -13,10 +14,39 @@
 
 SourceView::SourceView(QWidget *parent)
     : QWidget(parent)
+    , defaultThreshold_(130)
+    , defaultAnchorOpenClose_(17, 3)
+    , threshold_(defaultThreshold_)
+    , anchorOpenClose_(defaultAnchorOpenClose_)
 {
     layoutMain_ = new QVBoxLayout(this);
-    layoutMain_->setContentsMargins(3, 3, 3, 3);
-    layoutMain_->setSpacing(3);
+
+    QHBoxLayout *layoutTop = new QHBoxLayout();
+    layoutTop->setSpacing(10);
+    layoutMain_->addLayout(layoutTop);
+
+    settingsView_ = new SettingsView(this);
+    layoutTop->addWidget(settingsView_);
+
+    QVBoxLayout *layoutRight = new QVBoxLayout();
+    layoutRight->setSpacing(8);
+    layoutTop->addLayout(layoutRight);
+
+    buttonResetSettings_ = new JRoundButton(tr("Reset Settings"), this);
+    buttonResetSettings_->setFixedSize(150, 40);
+    buttonResetSettings_->setBorderRadius(20);
+    layoutRight->addWidget(buttonResetSettings_);
+
+    buttonSwitchView_ = new JRoundButton(tr("Switch View"), this);
+    buttonSwitchView_->setFixedSize(150, 40);
+    buttonSwitchView_->setBorderRadius(20);
+    layoutRight->addWidget(buttonSwitchView_);
+
+    buttonCapture_ = new JRoundButton(tr("Capture"), this);
+    buttonCapture_->setFixedSize(150, 40);
+    buttonCapture_->setBorderRadius(20);
+    buttonCapture_->hide();
+    layoutRight->addWidget(buttonCapture_);
 
     stackedWidget_ = new QStackedWidget(this);
     stackedWidget_->setObjectName(QLatin1String("home.sourceview.stack"));
@@ -32,18 +62,15 @@ SourceView::SourceView(QWidget *parent)
     imageLabel_->setClickable(true);
     stackedWidget_->addWidget(imageLabel_);
 
-    QHBoxLayout *layoutBottom = new QHBoxLayout();
-    layoutBottom->setAlignment(Qt::AlignHCenter);
-    layoutMain_->addLayout(layoutBottom);
-
-    buttonCapture_ = new JRoundButton(tr("Capture"), this);
-    buttonCapture_->setFixedWidth(120);
-    buttonCapture_->hide();
-    layoutBottom->addWidget(buttonCapture_);
-
-    buttonSwitchView_ = new JRoundButton(tr("Switch View"), this);
-    buttonSwitchView_->setFixedWidth(120);
-    layoutBottom->addWidget(buttonSwitchView_);
+    connect(settingsView_, &SettingsView::thresholdChanged, this, [=](int value){
+        setThreshold(value);
+    });
+    connect(settingsView_, &SettingsView::anchorOpenCloseChanged, this, [=](const QSize &size){
+        setAnchorOpenClose(size);
+    });
+    connect(settingsView_, &SettingsView::anchorErodeChanged, this, [=](const QSize &size){
+        setAnchorErode(size);
+    });
 
     connect(stackedWidget_, &QStackedWidget::currentChanged, this, [=](int index){
         switch (index) {
@@ -73,9 +100,17 @@ SourceView::SourceView(QWidget *parent)
             //Q_EMIT captured(image);
         }
     });
+    connect(videoWidget_, &VideoWidget::anchorErodeChanged, this, &SourceView::anchorErodeChanged);
 
     connect(imageLabel_, &ImageLabel::filePathChanged, [=](const QString &filePath){
         Q_EMIT filePathChanged(filePath);
+    });
+    connect(buttonResetSettings_, &JRoundButton::clicked, [=](){
+        settingsView_->setThreshold(defaultThreshold());
+        settingsView_->setAnchorOpenClose(defaultAnchorOpenClose());
+        if (videoWidget_) {
+            settingsView_->setAnchorErode(videoWidget_->defaultAnchorErode());
+        }
     });
     connect(buttonCapture_, &JRoundButton::clicked, this, [=](){
         const QImage imageCaptured = videoWidget_->imageCaptured();
@@ -95,7 +130,6 @@ SourceView::SourceView(QWidget *parent)
         }
     });
 
-
     timerTrack_ = new QTimer(this);
     timerTrack_->setInterval(300);
     connect(timerTrack_, &QTimer::timeout, this, [=](){
@@ -104,6 +138,11 @@ SourceView::SourceView(QWidget *parent)
         }
     });
     timerTrack_->start();
+
+    //
+    settingsView_->setThreshold(threshold());
+    settingsView_->setAnchorOpenClose(anchorOpenClose());
+    settingsView_->setAnchorErode(anchorErode());
 }
 
 SourceView::~SourceView()
@@ -139,11 +178,6 @@ const std::vector<std::vector<cv::Point> > &SourceView::contours() const
     return videoWidget_->contours();
 }
 
-QSize SourceView::areaSize() const
-{
-    return videoWidget_->areaSize();
-}
-
 int SourceView::currentIndex() const
 {
     return stackedWidget_->currentIndex();
@@ -152,6 +186,35 @@ int SourceView::currentIndex() const
 void SourceView::setCurrentIndex(int index)
 {
     stackedWidget_->setCurrentIndex(index);
+}
+
+int SourceView::threshold() const
+{
+    return threshold_;
+}
+
+QSize SourceView::anchorOpenClose() const
+{
+    return anchorOpenClose_;
+}
+
+QSize SourceView::anchorErode() const
+{
+    if (videoWidget_) {
+        return videoWidget_->anchorErode();
+    } else {
+        return QSize();
+    }
+}
+
+int SourceView::defaultThreshold() const
+{
+    return defaultThreshold_;
+}
+
+QSize SourceView::defaultAnchorOpenClose() const
+{
+    return defaultAnchorOpenClose_;
 }
 
 void SourceView::startCapture()
@@ -186,6 +249,39 @@ void SourceView::setSourceImage(const QPixmap &pixmap)
     }
 }
 
+void SourceView::setThreshold(int value)
+{
+    if (value < 0 || value > 255) {
+        return;
+    }
+
+    if (value != threshold_) {
+        threshold_ = value;
+        Q_EMIT thresholdChanged(value);
+        if (videoWidget_) {
+            videoWidget_->update();
+        }
+    }
+}
+
+void SourceView::setAnchorOpenClose(const QSize &size)
+{
+    if (size != anchorOpenClose_) {
+        anchorOpenClose_ = size;
+        Q_EMIT anchorOpenCloseChanged(size);
+        if (videoWidget_) {
+            videoWidget_->update();
+        }
+    }
+}
+
+void SourceView::setAnchorErode(const QSize &size)
+{
+    if (videoWidget_) {
+        videoWidget_->setAnchorErode(size);
+    }
+}
+
 bool SourceView::updateBoundRect()
 {
     videoWidget_->releaseBinaryImage();
@@ -200,8 +296,6 @@ bool SourceView::updateBoundRect()
         return false;
     }
 
-    // rectange (480, 800)
-
     cv::Mat imSource;
 
     OCRMgr::qImageToCvMat(imageCaptured, imSource);
@@ -211,7 +305,7 @@ bool SourceView::updateBoundRect()
         return false;
     }
 
-    const QSize areaSize = videoWidget_->areaSize();
+    const QSize anchorErode = videoWidget_->anchorErode();
 
 #if 0
     cv::Mat imSourceSmall;
@@ -238,7 +332,7 @@ bool SourceView::updateBoundRect()
 
     //
     cv::Mat imNoMarker, imBinary;
-    cv::threshold(imGray, imBinary, 120, 255, cv::THRESH_BINARY);
+    cv::threshold(imGray, imBinary, threshold_, 255, cv::THRESH_BINARY);
 
     // remove invalid line
     if (!OCRMgr::removeInvalidLine(imBinary)) {
@@ -257,7 +351,8 @@ bool SourceView::updateBoundRect()
 #endif
 #if 1
     // open / close
-    cv::Mat emKernelOpenClose = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(17, 3));
+    cv::Mat emKernelOpenClose = cv::getStructuringElement(
+                cv::MORPH_RECT, cv::Size(anchorOpenClose_.width(), anchorOpenClose_.height()));
     cv::Mat imOpened;
     cv::morphologyEx(imBinary, imOpened, cv::MORPH_OPEN, emKernelOpenClose);
     cv::Mat imClosed;
@@ -265,7 +360,8 @@ bool SourceView::updateBoundRect()
 #endif
     //
 #if 1
-    cv::Mat emKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(areaSize.width(), areaSize.height()));
+    cv::Mat emKernel = cv::getStructuringElement(
+                cv::MORPH_RECT, cv::Size(anchorErode.width(), anchorErode.height()));
     cv::Mat imErode;
     cv::erode(imClosed, imErode, emKernel);
     cv::findContours(imErode, contours, cv::RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));

@@ -32,8 +32,9 @@ public:
     void setImageCaptured(const QImage &image);
     QImage clipedImageCaptured(const QImage &image) const;
 
-    QSize areaSize() const;
-    void setAreaSize(const QSize &size);
+    QSize anchorErode() const;
+    void setAnchorErode(const QSize &size);
+    QSize defaultAnchorErode() const;
 
     QSize clipedSize() const;
     void setClipedSize(const QSize &size);
@@ -47,6 +48,7 @@ public:
 
 Q_SIGNALS:
     void captured(const QImage &image);
+    void anchorErodeChanged(const QSize &size);
 
 public Q_SLOTS:
     bool start();
@@ -61,7 +63,8 @@ private:
     std::vector<std::vector<cv::Point> > contours_;
     QImage imageCaptured_;
     cv::Mat binaryImage_;
-    QSize areaSize_;
+    QSize defaultAnchorErode_;
+    QSize anchorErode_;
     QSize clipedSize_;
 };
 

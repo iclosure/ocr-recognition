@@ -70,7 +70,7 @@
 <context>
     <name>HomeWindow</name>
     <message>
-        <location filename="../../module/home/HomeWindow.cpp" line="37"/>
+        <location filename="../../module/home/HomeWindow.cpp" line="38"/>
         <source>Device informations</source>
         <translation>设备信息</translation>
     </message>
@@ -141,14 +141,52 @@
     </message>
 </context>
 <context>
-    <name>SourceView</name>
+    <name>SettingsView</name>
     <message>
-        <location filename="../../module/home/SourceView.cpp" line="39"/>
-        <source>Capture</source>
-        <translation>识别图像</translation>
+        <location filename="../../module/home/SettingsView.cpp" line="17"/>
+        <source>Parameter Settings</source>
+        <translation>参数调整</translation>
     </message>
     <message>
-        <location filename="../../module/home/SourceView.cpp" line="44"/>
+        <location filename="../../module/home/SettingsView.cpp" line="28"/>
+        <source>Threshold:</source>
+        <translation>二值化阈值：</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SettingsView.cpp" line="42"/>
+        <source>Open-Close Width:</source>
+        <translation>开闭宽度：</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SettingsView.cpp" line="56"/>
+        <source>Open-Close Height:</source>
+        <translation>开闭高度：</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SettingsView.cpp" line="70"/>
+        <source>Erode Width:</source>
+        <translation>腐蚀宽度：</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SettingsView.cpp" line="84"/>
+        <source>Erode Height:</source>
+        <translation>腐蚀高度：</translation>
+    </message>
+</context>
+<context>
+    <name>SourceView</name>
+    <message>
+        <location filename="../../module/home/SourceView.cpp" line="35"/>
+        <source>Reset Settings</source>
+        <translation>复位参数</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SourceView.cpp" line="45"/>
+        <source>Capture</source>
+        <translation>识别文字</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SourceView.cpp" line="40"/>
         <source>Switch View</source>
         <translation>切换视图</translation>
     </message>

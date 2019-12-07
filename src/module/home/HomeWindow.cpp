@@ -31,6 +31,7 @@ HomeWindow::HomeWindow(QWidget *parent)
 
     labelBinary_ = new ImageLabel(this);
     labelBinary_->setObjectName(QLatin1String("_image_"));
+    labelBinary_->setMinimumWidth(300);
     labelBinary_->setClickable(false);
     splitter_->addWidget(labelBinary_);
 
@@ -41,6 +42,7 @@ HomeWindow::HomeWindow(QWidget *parent)
     layoutRight->setAlignment(Qt::AlignVCenter);
 
     editDevInfo_ = new QPlainTextEdit(groupRight);
+    editDevInfo_->setMinimumWidth(300);
     editDevInfo_->setReadOnly(true);
     layoutRight->addWidget(editDevInfo_);
 
@@ -49,8 +51,8 @@ HomeWindow::HomeWindow(QWidget *parent)
         setCursor(Qt::BusyCursor);
         cv::Mat binaryImage = sourceView_->binaryImage();
         const std::vector<std::vector<cv::Point> > &contours = sourceView_->contours();
-        const QStringList sections = OCRMgr::instance()
-                ->test(binaryImage, contours, sourceView_->areaSize());
+        const QStringList sections = OCRMgr::instance()->test(
+                    binaryImage, contours, sourceView_->anchorErode());
         const QString text = sections.join(QLatin1String("\n--------------------------\n"));
         editDevInfo_->setPlainText(text);
         unsetCursor();
@@ -65,7 +67,10 @@ HomeWindow::HomeWindow(QWidget *parent)
 
             QPixmap pmSource, pmBinary;
 
-            const QStringList sections = OCRMgr::instance()->test(filePath, sourceView_->areaSize(), &pmSource, &pmBinary);
+            const QStringList sections = OCRMgr::instance()->test(
+                        filePath, sourceView_->threshold(),
+                        sourceView_->anchorOpenClose(), sourceView_->anchorErode(),
+                        &pmSource, &pmBinary);
 
             sourceView_->setSourceImage(pmSource);
             labelBinary_->setPixmap(pmBinary);

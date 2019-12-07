@@ -12,7 +12,8 @@ VideoWidget::VideoWidget(QWidget *parent)
     : QCameraViewfinder(parent)
     , camera_(nullptr)
     , cameraImageCapture_(nullptr)
-    , areaSize_(30, 12)
+    , defaultAnchorErode_(30, 12)
+    , anchorErode_(defaultAnchorErode_)
 {
 
 }
@@ -138,17 +139,23 @@ QImage VideoWidget::clipedImageCaptured(const QImage &image) const
     return image;
 }
 
-QSize VideoWidget::areaSize() const
+QSize VideoWidget::anchorErode() const
 {
-    return areaSize_;
+    return anchorErode_;
 }
 
-void VideoWidget::setAreaSize(const QSize &size)
+void VideoWidget::setAnchorErode(const QSize &size)
 {
-    if (size != areaSize_) {
-        areaSize_ = size;
+    if (size != anchorErode_) {
+        anchorErode_ = size;
+        Q_EMIT anchorErodeChanged(size);
         update();
     }
+}
+
+QSize VideoWidget::defaultAnchorErode() const
+{
+    return defaultAnchorErode_;
 }
 
 QSize VideoWidget::clipedSize() const
@@ -158,7 +165,7 @@ QSize VideoWidget::clipedSize() const
 
 void VideoWidget::setClipedSize(const QSize &size)
 {
-    if (size != areaSize_) {
+    if (size != anchorErode_) {
         clipedSize_ = size;
         update();
     }
@@ -262,7 +269,7 @@ void VideoWidget::paintEvent(QPaintEvent *event)
         //
         const cv::Rect rect = cv::boundingRect(contour);
         //qCritical().noquote() << rect.width << rect.height;
-        if ((rect.width >= binaryImage_.cols) || (rect.height >= areaSize_.width() * 2)) {
+        if ((rect.width >= binaryImage_.cols) || (rect.height >= anchorErode_.width() * 2)) {
             continue;
         }
         painterImage.drawRect(x + rect.x, y + rect.y, rect.width, rect.height);

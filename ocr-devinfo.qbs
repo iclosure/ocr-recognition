@@ -9,6 +9,6 @@ I.JSolution {
     buildVersion: 1
 
     readonly property path opencvDir: Environment.getEnv('OPENCV_HOME')
-    //readonly property path tesseractDir: Environment.getEnv('Tesseract_DIR')
-    readonly property path tesseractDir: "C:/Program Files/tesseract"
+    readonly property path tesseractDir: Environment.getEnv('Tesseract_DIR')
+    //readonly property path tesseractDir: "C:/Program Files/tesseract"
 }

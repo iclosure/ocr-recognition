@@ -46,7 +46,7 @@ int main(int argc, char **argv)
         }
 #endif
 #ifdef _MSC_VER
-        QApplication::setFont(QFont(QLatin1String("Microsoft YaHei"), 10));
+        QApplication::setFont(QFont(QLatin1String("Microsoft YaHei"), 12));
         //QApplication::setFont(QFont("Noto Sans S Chinese Bold", 12));
 #endif
         QApplication::setWindowIcon(QIcon(QLatin1String(":/desktop/image/favicon.png")));

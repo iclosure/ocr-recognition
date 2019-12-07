@@ -19,13 +19,14 @@ public:
 
     QStringList test(const cv::Mat &imBinary,
                      const std::vector<std::vector<cv::Point> > &contours,
-                     const QSize &size);
-    QStringList test(cv::Mat imSource, const QSize &size,
-                     QPixmap *pmSource, QPixmap *pmBinary);
-    QStringList test(const QString &filePath, const QSize &size,
-                     QPixmap *pmSource = nullptr, QPixmap *pmBinary = nullptr);
-    QStringList test(const QImage &image, const QSize &size,
-                     QPixmap *pmSource = nullptr, QPixmap *pmBinary = nullptr);
+                     const QSize &erodeSize);
+    QStringList test(cv::Mat imSource,  int threshold, const QSize &anchorOpenClose,
+                     const QSize &erodeSize, QPixmap *pmSource, QPixmap *pmBinary);
+    QStringList test(const QString &filePath, int threshold, const QSize &anchorOpenClose,
+                     const QSize &erodeSize, QPixmap *pmSource = nullptr,
+                     QPixmap *pmBinary = nullptr);
+    QStringList test(const QImage &image, int threshold, const QSize &anchorOpenClose,
+                     const QSize &erodeSize, QPixmap *pmSource = nullptr, QPixmap *pmBinary = nullptr);
 
     static bool removeInvalidLine(cv::Mat &imBinary);
 

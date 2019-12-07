@@ -24,6 +24,7 @@ private:
 
 void OCRMgrPrivate::init()
 {
+
 }
 
 // class OCRMgr
@@ -139,7 +140,7 @@ QPixmap OCRMgr::cvMatToQPixmap(const cv::Mat &inMat)
 
 QStringList OCRMgr::test(const cv::Mat &imBinary,
                          const std::vector<std::vector<cv::Point> > &contours,
-                         const QSize &size)
+                         const QSize &erodeSize)
 {
     if (imBinary.empty()) {
         return QStringList();
@@ -161,7 +162,7 @@ QStringList OCRMgr::test(const cv::Mat &imBinary,
         const cv::Rect rect = cv::boundingRect(contour);
         //qCritical().noquote() << rect.width << rect.height;
         if ((rect.width >= imBinary.cols)
-                || (rect.height >= size.width() * 2)) {
+                || (rect.height >= erodeSize.width() * 2)) {
             continue;
         }
         //
@@ -180,14 +181,14 @@ QStringList OCRMgr::test(const cv::Mat &imBinary,
     return sections;
 }
 
-QStringList OCRMgr::test(cv::Mat imSource, const QSize &size,
-                         QPixmap *pmSource, QPixmap *pmBinary)
+QStringList OCRMgr::test(cv::Mat imSource, int threshold, const QSize &anchorOpenClose,
+                         const QSize &erodeSize, QPixmap *pmSource, QPixmap *pmBinary)
 {
     if (imSource.empty()) {
         return QStringList();
     }
 
-    QSize newSize = size;
+    QSize newSize = erodeSize;
     const int factor = 3;
 
 #if 1
@@ -216,7 +217,7 @@ QStringList OCRMgr::test(cv::Mat imSource, const QSize &size,
 
     //
     cv::Mat imNoMarker, imBinary;
-    cv::threshold(imGray, imBinary, 130, 255, cv::THRESH_BINARY);
+    cv::threshold(imGray, imBinary, threshold, 255, cv::THRESH_BINARY);
 
     if (!removeInvalidLine(imBinary)) {
         return QStringList();
@@ -230,7 +231,9 @@ QStringList OCRMgr::test(cv::Mat imSource, const QSize &size,
 #endif
 #if 1
     // open / close
-    cv::Mat emKernelOpenClose = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(17 * factor, 3 * factor));
+    cv::Mat emKernelOpenClose = cv::getStructuringElement(
+                cv::MORPH_RECT, cv::Size(anchorOpenClose.width() * factor,
+                                         anchorOpenClose.height() * factor));
     cv::Mat imOpened;
     cv::morphologyEx(imBinary, imOpened, cv::MORPH_OPEN, emKernelOpenClose);
     cv::Mat imClosed;
@@ -330,8 +333,8 @@ QStringList OCRMgr::test(cv::Mat imSource, const QSize &size,
     return sections;
 }
 
-QStringList OCRMgr::test(const QString &filePath, const QSize &size,
-                         QPixmap *pmSource, QPixmap *pmBinary)
+QStringList OCRMgr::test(const QString &filePath, int threshold, const QSize &anchorOpenClose,
+                         const QSize &erodeSize, QPixmap *pmSource, QPixmap *pmBinary)
 {
 
 #if 0
@@ -349,11 +352,11 @@ QStringList OCRMgr::test(const QString &filePath, const QSize &size,
         return QStringList();
     }
 
-    return test(imSource, size, pmSource, pmBinary);
+    return test(imSource, threshold, anchorOpenClose, erodeSize, pmSource, pmBinary);
 }
 
-QStringList OCRMgr::test(const QImage &image, const QSize &size,
-                         QPixmap *pmSource, QPixmap *pmBinary)
+QStringList OCRMgr::test(const QImage &image, int threshold, const QSize &anchorOpenClose,
+                         const QSize &erodeSize, QPixmap *pmSource, QPixmap *pmBinary)
 {
     if (image.isNull()) {
         return QStringList();
@@ -363,30 +366,26 @@ QStringList OCRMgr::test(const QImage &image, const QSize &size,
 
     qImageToCvMat(image, imSource);
 
-    return test(imSource, size, pmSource, pmBinary);
+    return test(imSource, threshold, anchorOpenClose, erodeSize, pmSource, pmBinary);
 }
 
 bool OCRMgr::removeInvalidLine(cv::Mat &imBinary)
 {
     int a,k,m;
-    for (int i = 0;i < imBinary.rows; i++) {
+
+    for (int i = 0; i < imBinary.rows; ++i) {
         uchar *data = imBinary.ptr<uchar>(i);
-        k =0;
-        for (int j= 0;j < imBinary.cols; j++)
-        {
+        k = 0;
+        for (int j = 0; j < imBinary.cols; ++j) {
             a = data[j];
-            if (a == 0)
-            {
-                k++ ;
-            }
-            else
-            {
+            if (a == 0) {
+                k++;
+            } else {
                 k = 0;
             }
-            if(k > imBinary.cols/8)
-            {
-                for (int m= 0;m < imBinary.cols; m++)
-                {
+
+            if (k > imBinary.cols / 8 ) {
+                for (m = 0; m < imBinary.cols; ++m) {
                     data[m] = 255;
                 }
                 j = imBinary.rows;
