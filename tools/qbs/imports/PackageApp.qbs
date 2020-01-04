@@ -41,7 +41,7 @@ PackageProduct {
             }
             return path + '/'
         }
-        files: [ 'api-ms-win-*.dll' ]
+        files: [ 'api-ms-win-*.dll', 'ucrtbase' + project.variantSuffix + '.dll' ]
         qbs.install: true
         qbs.installPrefix: dataInstallPrefix
         qbs.installDir: 'bin'
