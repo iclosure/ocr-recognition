@@ -64,7 +64,7 @@ WidgetApp {
     Group {
         name: 'Headers'
         files: [
-            '**/*.h',
+            '**/*.h'
         ]
     }
 

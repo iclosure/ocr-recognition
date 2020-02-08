@@ -36,9 +36,7 @@
 #define JSON_USE_CPPTL 1
 #endif
 #endif
-#if 1
-#include "../../../global.h"
-#else
+
 //
 #ifdef JWT_LIB
 #if defined(_MSC_VER) || defined(__BORLANDC__) || defined(__MINGW32__)
@@ -53,7 +51,7 @@
 #   endif // !JWT_BUILD
 #endif // _MSC_VER || ...
 #endif // JWT_LIB
-#endif
+
 #ifdef JSON_IN_CPPTL
 #define JSON_API CPPTL_API
 #elif defined(JSON_DLL_BUILD)

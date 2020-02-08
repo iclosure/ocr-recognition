@@ -29,7 +29,7 @@ SettingsView::SettingsView(QWidget *parent)
 
     spinThreshold_ = new QSpinBox(this);
     spinThreshold_->setRange(0, 255);
-    spinThreshold_->setFixedWidth(200);
+    spinThreshold_->setFixedWidth(120);
     layoutThreshold->addWidget(spinThreshold_);
 
     QSlider *sliderThreshold = new QSlider(Qt::Horizontal, this);
@@ -43,7 +43,7 @@ SettingsView::SettingsView(QWidget *parent)
 
     spinAnchorOpenWidth_ = new QSpinBox(this);
     spinAnchorOpenWidth_->setRange(1, 100);
-    spinAnchorOpenWidth_->setFixedWidth(200);
+    spinAnchorOpenWidth_->setFixedWidth(120);
     layoutOpenWidth->addWidget(spinAnchorOpenWidth_);
 
     QSlider *sliderAnchorOpenWidth = new QSlider(Qt::Horizontal, this);
@@ -57,7 +57,7 @@ SettingsView::SettingsView(QWidget *parent)
 
     spinAnchorOpenHeight_ = new QSpinBox(this);
     spinAnchorOpenHeight_->setRange(1, 100);
-    spinAnchorOpenHeight_->setFixedWidth(200);
+    spinAnchorOpenHeight_->setFixedWidth(120);
     layoutOpenHeight->addWidget(spinAnchorOpenHeight_);
 
     QSlider *sliderAnchorOpenHeight = new QSlider(Qt::Horizontal, this);
@@ -71,7 +71,7 @@ SettingsView::SettingsView(QWidget *parent)
 
     spinAnchorErodeWidth_ = new QSpinBox(this);
     spinAnchorErodeWidth_->setRange(1, 100);
-    spinAnchorErodeWidth_->setFixedWidth(200);
+    spinAnchorErodeWidth_->setFixedWidth(120);
     layoutAnchorErodeWidth->addWidget(spinAnchorErodeWidth_);
 
     QSlider *sliderAnchorErodeWidth = new QSlider(Qt::Horizontal, this);
@@ -85,7 +85,7 @@ SettingsView::SettingsView(QWidget *parent)
 
     spinAnchorErodeHeight_ = new QSpinBox(this);
     spinAnchorErodeHeight_->setRange(1, 100);
-    spinAnchorErodeHeight_->setFixedWidth(200);
+    spinAnchorErodeHeight_->setFixedWidth(120);
     layoutAnchorErodeHeigh->addWidget(spinAnchorErodeHeight_);
 
     QSlider *sliderAnchorErodeHeight = new QSlider(Qt::Horizontal, this);

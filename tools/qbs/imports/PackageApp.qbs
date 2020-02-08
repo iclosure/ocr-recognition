@@ -33,15 +33,17 @@ PackageProduct {
         prefix: {
             var vsVersion = Environment.getEnv('VisualStudioVersion')
             var versionFlag = Utilities.versionCompare(vsVersion, '15.0')
-            var path
+            var path = undefined
             if (versionFlag >= 0) {
-                path = FileInfo.joinPaths(Environment.getEnv('DevEnvDir'))
-            } else {
+                //path = FileInfo.joinPaths(Environment.getEnv('DevEnvDir'))
+                path = FileInfo.joinPaths(Environment.getEnv('VS150PROCOMNTOOLS'))
+            }
+            if (path == undefined) {
                 path = FileInfo.joinPaths(Environment.getEnv('SystemRoot'), 'system32')
             }
             return path + '/'
         }
-        files: [ 'api-ms-win-*.dll', 'ucrtbase' + project.variantSuffix + '.dll' ]
+        files: [ 'api-ms-win-*.dll' ]
         qbs.install: true
         qbs.installPrefix: dataInstallPrefix
         qbs.installDir: 'bin'
@@ -70,5 +72,19 @@ PackageProduct {
         qbs.install: true
         qbs.installPrefix: installPrefix
         qbs.installDir: FileInfo.joinPaths(installDir, 'bin')
+    }
+
+    // system32 - api*
+    Group {
+        name: 'data-system32-ucrtbase'
+        condition: installSystem32Api && qbs.targetOS.contains('windows')
+        prefix: {
+            var path = FileInfo.joinPaths(Environment.getEnv('SystemRoot'), 'system32')
+            return path + '/'
+        }
+        files: [ 'ucrtbase' + project.variantSuffix + '.dll' ]
+        qbs.install: true
+        qbs.installPrefix: dataInstallPrefix
+        qbs.installDir: 'bin'
     }
 }
