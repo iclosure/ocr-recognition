@@ -52,7 +52,7 @@ PackageProduct {
     // msvc-runtime
     Group {
         name: 'data-runtime'
-        condition: installSystem32Api && qbs.targetOS.contains('windows')
+        condition: installMsvcRuntime && qbs.targetOS.contains('windows')
         prefix: {
             var config = qbs.buildVariant === 'debug' ? 'debug_nonredist' : ''
             var vsVersion = Environment.getEnv('VisualStudioVersion')
@@ -65,7 +65,13 @@ PackageProduct {
             }
             var config = debugFlag ? 'debug_nonredist' : ''
             var crtDir = 'Microsoft.VC*.' + (debugFlag ? 'Debug' : '') + 'CRT'
-            var path = FileInfo.joinPaths(redistDir, config, qbs.architecture, crtDir) + '/'
+            var archName = ''
+            if (qbs.architecture == 'x86_64') {
+                archName = 'x64'
+            } else {
+                archName = qbs.architecture
+            }
+            var path = FileInfo.joinPaths(redistDir, config, archName, crtDir) + '/'
             return path
         }
         files: [ 'concrt*.dll', 'msvcr*.dll', 'msvcp*.dll', 'vccorlib*.dll', 'vcruntime*.dll' ]

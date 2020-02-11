@@ -8,6 +8,8 @@ PackageApp {
     name: 'com.smartsoft.desktop.app'
     type: base.concat([ 'data.tools.exe.out' ])
 
+    installSystem32Api: false
+
     readonly property path opencvDir: "C:/Users/iclosure/Documents/workspace/ai/opencv/build"
     readonly property path tesseractDir: "C:/Program Files/tesseract"
 

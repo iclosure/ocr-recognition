@@ -41,6 +41,7 @@ Module {
     Probe {
         id: probeSoci
         readonly property var _project: project
+        readonly property var _product: product
         readonly property var _qbs: qbs
         property bool SOCI_EMPTY: true
         property bool SOCI_SQLITE3: true
@@ -92,6 +93,9 @@ Module {
             }()
             // oracle
             ORACLE_HOME = function(){
+                if (_product.qbs.architecture == 'x86_64') {
+                    return undefined
+                }
                 var path = 'C:/app/iclosure/product/11.2.0/client_1'
                 if (File.exists(path)) {
                     return path
@@ -104,6 +108,9 @@ Module {
             }()
             // postgresql
             POSTGRESQL_HOME = function(){
+                if (_product.qbs.architecture == 'x86_64') {
+                    return undefined
+                }
                 var path = 'C:/app/postgresql-10.5-1'
                 if (File.exists(path)) {
                     return path
