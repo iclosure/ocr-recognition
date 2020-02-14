@@ -17,6 +17,19 @@ public:
     static QImage cvMatToQImage(const cv::Mat &inMat);
     static QPixmap cvMatToQPixmap(const cv::Mat &inMat);
 
+    static bool boundRectImage(std::vector<std::vector<cv::Point> > &contours,
+                               cv::Mat &imSource, cv::Mat &imBinary, int threshold,
+                               const QSize &anchorOpenClose, const QSize &anchorErode,
+                               QPixmap *pmSource = nullptr, QPixmap *pmBinary = nullptr);
+    static bool boundRectImage(std::vector<std::vector<cv::Point> > &contours,
+                               const QImage &image, cv::Mat &imSource, cv::Mat &imBinary, int threshold,
+                               const QSize &anchorOpenClose, const QSize &anchorErode,
+                               QPixmap *pmSource = nullptr, QPixmap *pmBinary = nullptr);
+    static bool boundRectImage(std::vector<std::vector<cv::Point> > &contours,
+                               const QString &filePath, cv::Mat &imSource, cv::Mat &imBinary,
+                               int threshold, const QSize &anchorOpenClose, const QSize &anchorErode,
+                               QPixmap *pmSource = nullptr, QPixmap *pmBinary = nullptr);
+
     QStringList test(const cv::Mat &imBinary,
                      const std::vector<std::vector<cv::Point> > &contours,
                      const QSize &erodeSize);
@@ -29,6 +42,8 @@ public:
                      const QSize &erodeSize, QPixmap *pmSource = nullptr, QPixmap *pmBinary = nullptr);
 
     static bool removeInvalidLine(cv::Mat &imBinary);
+
+    static const char *tessVariableValue();
 
 Q_SIGNALS:
 

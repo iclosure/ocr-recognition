@@ -70,9 +70,14 @@
 <context>
     <name>HomeWindow</name>
     <message>
-        <location filename="../../module/home/HomeWindow.cpp" line="38"/>
-        <source>Device informations</source>
-        <translation>设备信息</translation>
+        <location filename="../../module/home/HomeWindow.cpp" line="39"/>
+        <source>Reognition informations</source>
+        <translation>识别信息</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/HomeWindow.cpp" line="50"/>
+        <source>Generate report</source>
+        <translation>生成报表</translation>
     </message>
 </context>
 <context>
@@ -125,17 +130,17 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../main.cpp" line="93"/>
+        <location filename="../../main.cpp" line="94"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="94"/>
+        <location filename="../../main.cpp" line="95"/>
         <source>Initialize translators failure!</source>
         <translation>初始化翻译引擎失败！</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="99"/>
+        <location filename="../../main.cpp" line="100"/>
         <source>OCR-DevInfo</source>
         <translation>设备信息识别软件</translation>
     </message>
@@ -148,27 +153,37 @@
         <translation>参数调整</translation>
     </message>
     <message>
-        <location filename="../../module/home/SettingsView.cpp" line="28"/>
+        <location filename="../../module/home/SettingsView.cpp" line="32"/>
+        <source>Reognition Area Width:</source>
+        <translation>框选宽度：</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SettingsView.cpp" line="46"/>
+        <source>Reognition Area Height:</source>
+        <translation>框选高度：</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SettingsView.cpp" line="60"/>
         <source>Threshold:</source>
         <translation>二值化阈值：</translation>
     </message>
     <message>
-        <location filename="../../module/home/SettingsView.cpp" line="42"/>
+        <location filename="../../module/home/SettingsView.cpp" line="74"/>
         <source>Open-Close Width:</source>
         <translation>开闭宽度：</translation>
     </message>
     <message>
-        <location filename="../../module/home/SettingsView.cpp" line="56"/>
+        <location filename="../../module/home/SettingsView.cpp" line="88"/>
         <source>Open-Close Height:</source>
         <translation>开闭高度：</translation>
     </message>
     <message>
-        <location filename="../../module/home/SettingsView.cpp" line="70"/>
+        <location filename="../../module/home/SettingsView.cpp" line="102"/>
         <source>Erode Width:</source>
         <translation>腐蚀宽度：</translation>
     </message>
     <message>
-        <location filename="../../module/home/SettingsView.cpp" line="84"/>
+        <location filename="../../module/home/SettingsView.cpp" line="116"/>
         <source>Erode Height:</source>
         <translation>腐蚀高度：</translation>
     </message>
@@ -176,17 +191,17 @@
 <context>
     <name>SourceView</name>
     <message>
-        <location filename="../../module/home/SourceView.cpp" line="35"/>
+        <location filename="../../module/home/SourceView.cpp" line="32"/>
         <source>Reset Settings</source>
         <translation>复位参数</translation>
     </message>
     <message>
-        <location filename="../../module/home/SourceView.cpp" line="45"/>
-        <source>Capture</source>
-        <translation>识别文字</translation>
+        <location filename="../../module/home/SourceView.cpp" line="42"/>
+        <source>Recognition</source>
+        <translation>识别字符</translation>
     </message>
     <message>
-        <location filename="../../module/home/SourceView.cpp" line="40"/>
+        <location filename="../../module/home/SourceView.cpp" line="37"/>
         <source>Switch View</source>
         <translation>切换视图</translation>
     </message>

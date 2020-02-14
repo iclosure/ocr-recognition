@@ -10,10 +10,10 @@
 
 VideoWidget::VideoWidget(QWidget *parent)
     : QCameraViewfinder(parent)
+    , isCaptureDestinationSupported_(false)
     , camera_(nullptr)
     , cameraImageCapture_(nullptr)
-    , defaultAnchorErode_(30, 12)
-    , anchorErode_(defaultAnchorErode_)
+    , anchorErode_(0, 0)
 {
 
 }
@@ -54,11 +54,16 @@ bool VideoWidget::init()
 #endif
 
     cameraImageCapture_ = new QCameraImageCapture(camera_, this);
+    cameraImageCapture_->setBufferFormat(QVideoFrame::PixelFormat::Format_Jpeg);
+    isCaptureDestinationSupported_ = cameraImageCapture_->isCaptureDestinationSupported(QCameraImageCapture::CaptureToBuffer);
+    if (isCaptureDestinationSupported_) {
+        cameraImageCapture_->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+    }
 
     QImageEncoderSettings encodingSettings = cameraImageCapture_->encodingSettings();
     encodingSettings.setResolution(1920, 1080);
-    //encodingSettings.setResolution(500, 900);
-    encodingSettings.setQuality(QMultimedia::VeryHighQuality);
+    //encodingSettings.setResolution(640, 360);
+    encodingSettings.setQuality(QMultimedia::VeryLowQuality);
     cameraImageCapture_->setEncodingSettings(encodingSettings);
 
     camera_->setViewfinder(this);
@@ -69,11 +74,13 @@ bool VideoWidget::init()
     viewFinderSettings.setMaximumFrameRate(15);
     camera_->setViewfinderSettings(viewFinderSettings);
 #endif
+    connect(cameraImageCapture_, &QCameraImageCapture::readyForCaptureChanged, this,
+            &VideoWidget::readyForCaptureChanged);
     connect(cameraImageCapture_, &QCameraImageCapture::imageCaptured, this,
             [=](int id, const QImage &preview){
         Q_UNUSED(id)
         Q_EMIT captured(preview);
-    });
+    }, Qt::QueuedConnection);
 
     camera_->start(); // to start the viewfinder
 
@@ -153,11 +160,6 @@ void VideoWidget::setAnchorErode(const QSize &size)
     }
 }
 
-QSize VideoWidget::defaultAnchorErode() const
-{
-    return defaultAnchorErode_;
-}
-
 QSize VideoWidget::clipedSize() const
 {
     return clipedSize_;
@@ -220,6 +222,8 @@ bool VideoWidget::start()
 
     camera_->start();
 
+    capture();
+
     return true;
 }
 
@@ -229,11 +233,26 @@ void VideoWidget::stop()
         return;
     }
 
+    if (cameraImageCapture_) {
+        cameraImageCapture_->cancelCapture();
+    }
+
     if (!camera_->isAvailable()) {
         return;
     }
 
     camera_->stop();
+}
+
+void VideoWidget::capture()
+{
+    if (cameraImageCapture_) {
+        if (isCaptureDestinationSupported_) {
+            cameraImageCapture_->capture();
+        } else {
+            cameraImageCapture_->capture(QLatin1String("ocr"));
+        }
+    }
 }
 
 void VideoWidget::paintEvent(QPaintEvent *event)

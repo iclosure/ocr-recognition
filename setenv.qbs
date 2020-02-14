@@ -3,6 +3,7 @@ import qbs.File
 import qbs.FileInfo
 import qbs.TextFile
 import qbs.Environment
+import tools.EnvUtils
 
 Project {
 
@@ -55,15 +56,30 @@ Project {
         Depends { name: 'cpp' }
         Group {
             name: 'opencv'
-            prefix: project.opencvDir + '/bin/'
+            condition: !project.useVcPkgStatic
+            prefix: project.useVcPkg ? project.vcpkgLibBin : project.opencvDir + '/bin/'
             files: {
                 var items = []
-                if (qbs.architecture == 'x86_64') {
-                    items.push('opencv_videoio_ffmpeg411_64.dll')
-                    items.push('../x64/vc15/bin/opencv_world411.dll')
+                if (project.useVcPkg) {
+                    items.push('jpeg62.dll')
+                    items.push('zlib' + project.variantSuffix + '1.dll')
+                    items.push('webp' + EnvUtils.dylibSuffix(qbs))
+                    items.push('libpng16' + EnvUtils.dylibSuffix(qbs))
+                    items.push('tiff' + EnvUtils.dylibSuffix(qbs))
+                    items.push('lzma' + EnvUtils.dylibSuffix(qbs))
+                    items.push('opencv_core' + EnvUtils.dylibSuffix(qbs))
+                    items.push('opencv_imgcodecs' + EnvUtils.dylibSuffix(qbs))
+                    items.push('opencv_imgproc' + EnvUtils.dylibSuffix(qbs))
+                    items.push('opencv_photo' + EnvUtils.dylibSuffix(qbs))
+                    items.push('leptonica-1.78.0' + EnvUtils.dylibSuffix(qbs))
                 } else {
-                    items.push('opencv_videoio_ffmpeg411.dll')
-                    //items.push('../x86/vc15/bin/opencv_world411.dll')
+                    if (qbs.architecture == 'x86_64') {
+                        items.push('opencv_videoio_ffmpeg411_64.dll')
+                        items.push('../x64/vc15/bin/opencv_world411.dll')
+                    } else {
+                        items.push('opencv_videoio_ffmpeg411.dll')
+                        //items.push('../x86/vc15/bin/opencv_world411.dll')
+                    }
                 }
                 return items
             }
@@ -73,13 +89,18 @@ Project {
         }
         Group {
             name: 'tesseract'
-            prefix: project.tesseractDir + '/bin/'
+            condition: !project.useVcPkgStatic
+            prefix: project.useVcPkg ? project.vcpkgLibBin : project.opencvDir + '/bin/'
             files: {
                 var items = []
-                if (qbs.buildVariant == 'debug') {
-                    items.push('tesseract41d.dll')
+                if (project.useVcPkg) {
+                    //
                 } else {
-                    items.push('tesseract41.dll')
+                    if (qbs.buildVariant == 'debug') {
+                        items.push('tesseract41d.dll')
+                    } else {
+                        items.push('tesseract41.dll')
+                    }
                 }
                 return items
             }

@@ -10,6 +10,7 @@
 #include <QDateTime>
 #include <QIcon>
 #include <QMessageBox>
+#include <QStandardPaths>
 
 int main(int argc, char **argv)
 {
@@ -104,6 +105,13 @@ int main(int argc, char **argv)
     int ret = JMain::execApp(&app);
 
     //J::uninitialize();
+
+    // remove pictures
+    const QString picPath = QStandardPaths::writableLocation(QStandardPaths::PicturesLocation);
+    const QString filePath = picPath + QLatin1String("/ocr.jpg");
+    if (QFile::exists(filePath)) {
+        QFile::remove(filePath);
+    }
 
     return ret;
 }

@@ -3,15 +3,13 @@ import qbs.File
 import qbs.FileInfo
 import qbs.Environment
 import qbs.TextFile
+import tools.EnvUtils
 
 PackageApp {
     name: 'com.smartsoft.desktop.app'
     type: base.concat([ 'data.tools.exe.out' ])
 
     installSystem32Api: false
-
-    readonly property path opencvDir: "C:/Users/iclosure/Documents/workspace/ai/opencv/build"
-    readonly property path tesseractDir: "C:/Program Files/tesseract"
 
     // config
     Group {
@@ -70,11 +68,39 @@ PackageApp {
     // 3rdpart - opencv
     Group {
         name: 'data-app-opencv'
-        prefix: opencvDir + '/'
-        files: [
-            'bin/opencv_videoio_ffmpeg411_64.dll',
-            'x64/vc15/bin/opencv_world411.dll'
-        ]
+        condition: !project.useVcPkgStatic
+        prefix: {
+            if (project.useVcPkg) {
+                return project.useVcPkg ? project.vcpkgLibBin : project.opencvDir + '/bin/'
+            } else {
+                return project.opencvDir + '/'
+            }
+        }
+        files: {
+            var items = []
+            if (project.useVcPkg) {
+                if (!project.useVcPkgStatic) {
+                    items.push('jpeg62.dll')
+                    items.push('zlib' + project.variantSuffix + '1.dll')
+                    items.push('webp' + EnvUtils.dylibSuffix(qbs))
+                    items.push('libpng16' + EnvUtils.dylibSuffix(qbs))
+                    items.push('tiff' + EnvUtils.dylibSuffix(qbs))
+                    items.push('lzma' + EnvUtils.dylibSuffix(qbs))
+                    items.push('opencv_core' + EnvUtils.dylibSuffix(qbs))
+                    items.push('opencv_imgcodecs' + EnvUtils.dylibSuffix(qbs))
+                    items.push('opencv_imgproc' + EnvUtils.dylibSuffix(qbs))
+                    items.push('opencv_photo' + EnvUtils.dylibSuffix(qbs))
+                    items.push('leptonica-1.78.0' + EnvUtils.dylibSuffix(qbs))
+                }
+            } else {
+                items = [
+                            'bin/opencv_videoio_ffmpeg411_64.dll',
+                            'x64/vc15/bin/opencv_world411.dll'
+                        ]
+            }
+            return items
+        }
+
         qbs.install: true
         qbs.installPrefix: dataInstallPrefix
         qbs.installDir: 'bin'
@@ -83,7 +109,8 @@ PackageApp {
     // 3rdpart - tesseract
     Group {
         name: 'data-app-tesseract'
-        prefix: FileInfo.joinPaths(tesseractDir, 'bin') + '/'
+        condition: !project.useVcPkg && !project.useVcPkgStatic
+        prefix: FileInfo.joinPaths(project.tesseractDir, 'bin') + '/'
         files: [ 'pvt.cppan.demo.*.dll', 'tesseract*[^d].dll' ]
         qbs.install: true
         qbs.installPrefix: dataInstallPrefix

@@ -2,6 +2,7 @@
 #include "global.h"
 #include "jwt/widget/JSplitter.h"
 #include "jwt/widget/JGroupBox.h"
+#include "jwt/widget/JRoundButton.h"
 #include "common/OCRMgr.h"
 #include "ImageLabel.h"
 #include "SourceView.h"
@@ -35,7 +36,7 @@ HomeWindow::HomeWindow(QWidget *parent)
     labelBinary_->setClickable(false);
     splitter_->addWidget(labelBinary_);
 
-    JGroupBox *groupRight = new JGroupBox(tr("Device informations"), this);
+    JGroupBox *groupRight = new JGroupBox(tr("Reognition informations"), this);
     splitter_->addWidget(groupRight);
 
     QVBoxLayout *layoutRight = new QVBoxLayout(groupRight);
@@ -46,44 +47,44 @@ HomeWindow::HomeWindow(QWidget *parent)
     editDevInfo_->setReadOnly(true);
     layoutRight->addWidget(editDevInfo_);
 
+    buttonGenReport_ = new JRoundButton(tr("Generate report"), groupRight);
+    buttonGenReport_->setMinimumWidth(80);
+    layoutRight->addWidget(buttonGenReport_, 0, Qt::AlignHCenter);
+
     connect(sourceView_, &SourceView::captured, this, [=](const QImage &image){
         Q_UNUSED(image)
-        setCursor(Qt::BusyCursor);
-        cv::Mat binaryImage = sourceView_->binaryImage();
-        const std::vector<std::vector<cv::Point> > &contours = sourceView_->contours();
-        const QStringList sections = OCRMgr::instance()->test(
-                    binaryImage, contours, sourceView_->anchorErode());
-        const QString text = sections.join(QLatin1String("\n--------------------------\n"));
-        editDevInfo_->setPlainText(text);
-        unsetCursor();
+        recognite();
     });
-    connect(sourceView_, &SourceView::filePathChanged, this, [=](const QString &filePath){
-        if (filePath.isEmpty()) {
-            sourceView_->setSourceImage(QPixmap());
-            labelBinary_->setPixmap(QPixmap());
-            editDevInfo_->clear();
-        } else {
-            setCursor(Qt::BusyCursor);
-
-            QPixmap pmSource, pmBinary;
-
-            const QStringList sections = OCRMgr::instance()->test(
-                        filePath, sourceView_->threshold(),
-                        sourceView_->anchorOpenClose(), sourceView_->anchorErode(),
-                        &pmSource, &pmBinary);
-
-            sourceView_->setSourceImage(pmSource);
-            labelBinary_->setPixmap(pmBinary);
-
-            const QString text = sections.join(QLatin1String("\n--------------------------\n"));
-            editDevInfo_->setPlainText(text);
-
-            unsetCursor();
-        }
+    connect(sourceView_, &SourceView::filePathChanged, this, [=](){
+        updateImage();
+    });
+    connect(sourceView_, &SourceView::recognitionClicked, this, [=](){
+        recognite();
     });
     connect(sourceView_, &SourceView::binaryImageUpdated, this, [=](){
         const QPixmap pixmap = OCRMgr::cvMatToQPixmap(sourceView_->binaryImage());
         labelBinary_->setPixmap(pixmap);
+    });
+    connect(sourceView_, &SourceView::thresholdChanged, this, [=](){
+        if (sourceView_->currentIndex() != 1) {
+            return;
+        }
+        updateImage();
+    });
+    connect(sourceView_, &SourceView::anchorOpenCloseChanged, this, [=](){
+        if (sourceView_->currentIndex() != 1) {
+            return;
+        }
+        updateImage();
+    });
+    connect(sourceView_, &SourceView::anchorErodeChanged, this, [=](){
+        if (sourceView_->currentIndex() != 1) {
+            return;
+        }
+        updateImage();
+    });
+    connect(buttonGenReport_, &JRoundButton::clicked, this, [=](){
+        //
     });
 }
 
@@ -101,4 +102,33 @@ bool HomeWindow::init()
     result = result && sourceView_->init();
 
     return result;
+}
+
+void HomeWindow::updateImage()
+{
+    editDevInfo_->clear();
+
+    cv::Mat imSource;
+
+    if (!sourceView_->updateImage(imSource)) {
+        sourceView_->setSourceImage(QPixmap());
+        labelBinary_->setPixmap(QPixmap());
+        return;
+    }
+    //
+    QPixmap pmBinary;
+    pmBinary = OCRMgr::cvMatToQPixmap(sourceView_->binaryImage());
+    labelBinary_->setPixmap(pmBinary);
+}
+
+void HomeWindow::recognite()
+{
+    setCursor(Qt::BusyCursor);
+    cv::Mat binaryImage = sourceView_->binaryImage();
+    const std::vector<std::vector<cv::Point> > &contours = sourceView_->contours();
+    const QStringList sections = OCRMgr::instance()->test(
+                binaryImage, contours, sourceView_->anchorErode());
+    const QString text = sections.join(QLatin1String("\n--------------------------\n"));
+    editDevInfo_->setPlainText(text);
+    unsetCursor();
 }

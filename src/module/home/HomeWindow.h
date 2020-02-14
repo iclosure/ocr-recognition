@@ -10,6 +10,7 @@ class JSplitter;
 class QPlainTextEdit;
 class ImageLabel;
 class SourceView;
+class JRoundButton;
 
 class HomeWindow : public QWidget
 {
@@ -23,6 +24,10 @@ public:
 signals:
 
 public slots:
+    void updateImage();
+
+private:
+    void recognite();
 
 private:
     Q_DISABLE_COPY(HomeWindow)
@@ -30,6 +35,7 @@ private:
     SourceView *sourceView_;
     ImageLabel *labelBinary_;
     QPlainTextEdit *editDevInfo_;
+    JRoundButton *buttonGenReport_;
 };
 
 #endif // HOMEWINDOW_H

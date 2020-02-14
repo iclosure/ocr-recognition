@@ -327,16 +327,16 @@ int JMain::execApp(QApplication *app)
         QFileSystemWatcher *fileSysWatcher = new QFileSystemWatcher(JMain::instance());
         fileSysWatcher->addPath(filePath);
         QObject::connect(fileSysWatcher, &QFileSystemWatcher::fileChanged,
-                         [=](const QString &filePath){
-            JMainPrivate::setStyleSheet(filePath);
+                         [=](const QString &_filePath){
+            JMainPrivate::setStyleSheet(_filePath);
         });
         QObject::connect(JMain::instance(), &JMain::themeChanged,
                          [=](const QString &currnt, const QString &previous){
-            QString filePath(prefix + previous + QLatin1String(".qss"));
-            fileSysWatcher->removePath(filePath);
-            filePath = prefix + currnt + QLatin1String(".qss");
-            fileSysWatcher->addPath(filePath);
-            JMainPrivate::setStyleSheet(filePath);
+            QString _filePath(prefix + previous + QLatin1String(".qss"));
+            fileSysWatcher->removePath(_filePath);
+            _filePath = prefix + currnt + QLatin1String(".qss");
+            fileSysWatcher->addPath(_filePath);
+            JMainPrivate::setStyleSheet(_filePath);
         });
     } else {
         JMain::instance()->setTheme(theme);
@@ -371,7 +371,7 @@ int JMain::execApp(QApplication *app)
     mainWindow->showNormal();
 
     jnotify->on(QLatin1String("main.mainwindow.inst"), JMain::instance(), [=](JNEvent &event){
-        event.setReturnValue(qVariantFromValue(static_cast<void*>(mainWindow)));
+        event.setReturnValue(QVariant::fromValue<void*>(mainWindow));
     });
 
     int exitCode = app->exec();
@@ -543,7 +543,7 @@ J::ParserPtr JMain::parser(const QString &module) const
 
     J::ParserPtr parser;
     if (!jnotify->send(module + QLatin1String(".parser.inst"),
-                       qVariantFromValue(static_cast<void*>(&parser))).toBool()
+                       QVariant::fromValue<void*>(&parser)).toBool()
             || !parser) {
         return J::ParserPtr();
     }

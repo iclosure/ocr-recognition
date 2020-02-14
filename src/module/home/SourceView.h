@@ -36,17 +36,19 @@ public:
     QSize anchorOpenClose() const;
     QSize anchorErode() const;
 
-    int defaultThreshold() const;
-    QSize defaultAnchorOpenClose() const;
+    QString filePath() const;
 
 Q_SIGNALS:
     void captured(const QImage &image);
     void filePathChanged(const QString &filePath);
     void binaryImageUpdated();
 
+    void reogAreaChanged(const QSize &size);
     void thresholdChanged(int value);
     void anchorOpenCloseChanged(const QSize &size);
     void anchorErodeChanged(const QSize &size);
+
+    void recognitionClicked();
 
 public Q_SLOTS:
     void startCapture();
@@ -57,8 +59,11 @@ public Q_SLOTS:
     void setAnchorOpenClose(const QSize &size);
     void setAnchorErode(const QSize &size);
 
+    bool updateImage(cv::Mat &imSource);
+
 private:
     bool updateBoundRect();
+    void updateStackCurrentIndex();
 
 private:
     Q_DISABLE_COPY(SourceView)
@@ -68,14 +73,12 @@ private:
     VideoWidget *videoWidget_;
     ImageLabel *imageLabel_;
     JRoundButton *buttonResetSettings_;
-    JRoundButton *buttonCapture_;
+    JRoundButton *buttonRecognition_;
     JRoundButton *buttonSwitchView_;
     QTimer *timerTrack_;
     //
-    int defaultThreshold_;
-    QSize defaultAnchorOpenClose_;
-    int threshold_;
-    QSize anchorOpenClose_;
+    cv::Mat binaryImage_;
+    std::vector<std::vector<cv::Point> > contours_;
 };
 
 #endif

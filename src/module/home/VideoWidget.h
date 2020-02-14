@@ -34,7 +34,6 @@ public:
 
     QSize anchorErode() const;
     void setAnchorErode(const QSize &size);
-    QSize defaultAnchorErode() const;
 
     QSize clipedSize() const;
     void setClipedSize(const QSize &size);
@@ -47,23 +46,25 @@ public:
     void releaseBinaryImage();
 
 Q_SIGNALS:
+    void readyForCaptureChanged(bool ready);
     void captured(const QImage &image);
     void anchorErodeChanged(const QSize &size);
 
 public Q_SLOTS:
     bool start();
     void stop();
+    void capture();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
+    bool isCaptureDestinationSupported_;
     QCamera *camera_;
     QCameraImageCapture *cameraImageCapture_;
     std::vector<std::vector<cv::Point> > contours_;
     QImage imageCaptured_;
     cv::Mat binaryImage_;
-    QSize defaultAnchorErode_;
     QSize anchorErode_;
     QSize clipedSize_;
 };

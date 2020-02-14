@@ -52,7 +52,7 @@ bool OCRMgr::init()
 
 void OCRMgr::qImageToCvMat(const QImage &image, cv::OutputArray &matOut)
 {
-    switch(image.format()) {
+    switch(int(image.format())) {
     case QImage::Format_Invalid:
     {
         cv::Mat empty;
@@ -138,6 +138,133 @@ QPixmap OCRMgr::cvMatToQPixmap(const cv::Mat &inMat)
     return QPixmap::fromImage(cvMatToQImage(inMat));
 }
 
+bool OCRMgr::boundRectImage(std::vector<std::vector<cv::Point> > &contours, cv::Mat &imSource,
+                            cv::Mat &imBinary, int threshold, const QSize &anchorOpenClose,
+                            const QSize &anchorErode, QPixmap *pmSource, QPixmap *pmBinary)
+{
+    contours.clear();
+
+
+#if 0
+    const int factor = 3;
+    cv::Mat imSourceScaled;
+    cv::resize(imSource, imSourceScaled, cv::Size(), factor, factor, cv::INTER_LINEAR);
+    imSourceScaled.copyTo(imSource);
+    anchorErode *= 2;
+#else
+    const int factor = 1;
+#endif
+#if 0
+    //
+    cv::Mat imBlur;
+    cv::blur(imSource, imBlur, cv::Size(5, 5));
+
+    //
+    cv::Mat imMask;
+    cv::Rect rect;
+    cv::floodFill(imBlur, imMask, cv::Point(imBlur.cols - 1, imBlur.rows - 1),
+                  cv::Scalar(255, 255, 255), &rect, cv::Scalar(3, 3, 3), 8);
+#endif
+    //
+    cv::Mat imGray;
+    cv::cvtColor(imSource, imGray, CV_BGR2GRAY);
+
+    //
+    //cv::blur(imGray, imGray, cv::Size(5, 5));
+
+    //
+    cv::Mat imNoMarker;
+    cv::threshold(imGray, imBinary, threshold, 255, cv::THRESH_BINARY);
+
+    // remove invalid line
+    if (!OCRMgr::removeInvalidLine(imBinary)) {
+        //
+    }
+
+#if 0
+    cv::Mat emKernel0 = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(3, 3));
+    cv::Mat imDilate;
+    cv::erode(imBinary, imDilate, emKernel0, cv::Point(-1, -1), 1);
+    imDilate.copyTo(imBinary);
+#endif
+#if 1
+    // open / close
+    cv::Mat emKernelOpenClose = cv::getStructuringElement(
+                cv::MORPH_RECT, cv::Size(anchorOpenClose.width() * factor,
+                                         anchorOpenClose.height() * factor));
+    cv::Mat imOpened;
+    cv::morphologyEx(imBinary, imOpened, cv::MORPH_OPEN, emKernelOpenClose);
+    cv::Mat imClosed;
+    cv::morphologyEx(imOpened, imClosed, cv::MORPH_CLOSE, emKernelOpenClose);
+#endif
+    //
+#if 1
+    cv::Mat emKernel = cv::getStructuringElement(
+                cv::MORPH_RECT, cv::Size(anchorErode.width(), anchorErode.height()));
+    cv::Mat imErode;
+    cv::erode(imClosed, imErode, emKernel);
+    cv::findContours(imErode, contours, cv::RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
+#else
+    cv::Mat emKernel = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(6, 6));
+    cv::Mat imDilate;
+    cv::dilate(imBinary, imDilate, emKernel, cv::Point(-1, -1), 1);
+    cv::findContours(imDilate, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
+#endif
+    //
+    if (pmSource) {
+        for (auto citer = contours.crbegin(); citer != contours.crend(); ++citer) {
+            const auto &contour = *citer;
+            //
+            const cv::Rect rect = cv::boundingRect(contour);
+            //qCritical().noquote() << rect.width << rect.height;
+            if ((rect.width >= imBinary.cols)
+                    || (rect.height >= anchorErode.width() * 2)) {
+                continue;
+            }
+            //
+            cv::rectangle(imSource, rect, cv::Scalar(0, 0, 255), 2);
+        }
+
+        *pmSource = OCRMgr::cvMatToQPixmap(imSource);
+    }
+
+    //
+    if (pmBinary) {
+        *pmBinary = OCRMgr::cvMatToQPixmap(imBinary);
+    }
+
+    return true;
+}
+
+bool OCRMgr::boundRectImage(std::vector<std::vector<cv::Point> > &contours, const QImage &image,
+                            cv::Mat &imSource, cv::Mat &imBinary, int threshold,
+                            const QSize &anchorOpenClose, const QSize &anchorErode,
+                            QPixmap *pmSource, QPixmap *pmBinary)
+{
+    OCRMgr::qImageToCvMat(image, imSource);
+    if (imSource.empty()) {
+        return false;
+    }
+
+    return boundRectImage(contours, imSource, imBinary, threshold, anchorOpenClose, anchorErode,
+                          pmSource, pmBinary);
+}
+
+bool OCRMgr::boundRectImage(std::vector<std::vector<cv::Point> > &contours, const QString &filePath,
+                            cv::Mat &imSource, cv::Mat &imBinary, int threshold,
+                            const QSize &anchorOpenClose, const QSize &anchorErode, QPixmap *pmSource,
+                            QPixmap *pmBinary)
+{
+    if (!QFile::exists(filePath)) {
+        return false;
+    }
+
+    imSource = cv::imread(filePath.toStdString());
+
+    return boundRectImage(contours, imSource, imBinary, threshold, anchorOpenClose, anchorErode,
+                          pmSource, pmBinary);
+}
+
 QStringList OCRMgr::test(const cv::Mat &imBinary,
                          const std::vector<std::vector<cv::Point> > &contours,
                          const QSize &erodeSize)
@@ -148,7 +275,10 @@ QStringList OCRMgr::test(const cv::Mat &imBinary,
 
     // Pass it to Tesseract API
     tesseract::TessBaseAPI tess;
-    tess.Init(JMain::tessdataDir().toLocal8Bit().data(), "eng", tesseract::OEM_DEFAULT);
+    if (tess.Init(JMain::tessdataDir().toLocal8Bit().data(), "eng", tesseract::OEM_DEFAULT)) {
+        return QStringList();
+    }
+    tess.SetVariable("tessedit_char_whitelist", OCRMgr::tessVariableValue());
     tess.SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
     tess.SetImage(reinterpret_cast<uchar*>(imBinary.data), imBinary.cols, imBinary.rows,
                   1, imBinary.cols);
@@ -167,7 +297,13 @@ QStringList OCRMgr::test(const cv::Mat &imBinary,
         }
         //
         tess.SetRectangle(rect.x, rect.y, rect.width, rect.height);
-        QString text = QString::fromUtf8(tess.GetUTF8Text()).trimmed();
+        const char *_text = tess.GetUTF8Text();
+        if (!_text) {
+            continue;
+        }
+        QString text = QString::fromUtf8(_text).trimmed();
+        delete [] _text;
+        _text = nullptr;
         // remove charactor ',' and ' '
         text.replace(QLatin1Char(','), QLatin1Char('.'));
         text.remove(QLatin1Char(' '));
@@ -188,14 +324,14 @@ QStringList OCRMgr::test(cv::Mat imSource, int threshold, const QSize &anchorOpe
         return QStringList();
     }
 
-    QSize newSize = erodeSize;
+    QSize anchorErode = erodeSize;
     const int factor = 3;
 
 #if 1
     cv::Mat imSourceScaled;
     cv::resize(imSource, imSourceScaled, cv::Size(), factor, factor, cv::INTER_LINEAR);
     imSourceScaled.copyTo(imSource);
-    newSize *= 2;
+    anchorErode *= 2;
 #endif
 #if 0
     //
@@ -242,7 +378,8 @@ QStringList OCRMgr::test(cv::Mat imSource, int threshold, const QSize &anchorOpe
     std::vector<std::vector<cv::Point> > contours;
     //
 #if 1
-    cv::Mat emKernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(newSize.width(), newSize.height()));
+    cv::Mat emKernel = cv::getStructuringElement(
+                cv::MORPH_RECT, cv::Size(anchorErode.width(), anchorErode.height()));
     cv::Mat imErode;
     cv::erode(imClosed, imErode, emKernel);
     cv::findContours(imErode, contours, cv::RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
@@ -253,11 +390,12 @@ QStringList OCRMgr::test(cv::Mat imSource, int threshold, const QSize &anchorOpe
     cv::findContours(imDilate, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cvPoint(0, 0));
 #endif
 
-    qCritical().noquote() << QLatin1String("count of contours:") << contours.size();
+    //qCritical().noquote() << QLatin1String("count of contours:") << contours.size();
 
     // Pass it to Tesseract API
     tesseract::TessBaseAPI tess;
     tess.Init(JMain::tessdataDir().toLocal8Bit().data(), "eng", tesseract::OEM_DEFAULT);
+    tess.SetVariable("tessedit_char_whitelist", OCRMgr::tessVariableValue());
     tess.SetPageSegMode(tesseract::PSM_SINGLE_BLOCK);
 #if 0
     cv::Mat copiedBinary;
@@ -286,14 +424,20 @@ QStringList OCRMgr::test(cv::Mat imSource, int threshold, const QSize &anchorOpe
         const cv::Rect rect = cv::boundingRect(contour);
         //qCritical().noquote() << rect.width << rect.height;
         if ((rect.width >= imBinary.cols)
-                || (rect.height >= newSize.width() * 2)) {
+                || (rect.height >= anchorErode.width() * 2)) {
             continue;
         }
         //
         cv::rectangle(imSource, rect, cv::Scalar(0, 0, 255), 2);
         //
         tess.SetRectangle(rect.x, rect.y, rect.width, rect.height);
-        QString text = QString::fromUtf8(tess.GetUTF8Text()).trimmed();
+        const char *_text = tess.GetUTF8Text();
+        if (!_text) {
+            continue;
+        }
+        QString text = QString::fromUtf8(_text).trimmed();
+        delete [] _text;
+        _text = nullptr;
         // remove charactor ',' and ' '
         text.replace(QLatin1Char(','), QLatin1Char('.'));
         text.remove(QLatin1Char(' '));
@@ -394,4 +538,10 @@ bool OCRMgr::removeInvalidLine(cv::Mat &imBinary)
     }
 
     return true;
+}
+
+const char *OCRMgr::tessVariableValue()
+{
+    return "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.";
+    //return "0123456789BMNA-.";
 }

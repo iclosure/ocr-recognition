@@ -9,5 +9,6 @@ PackageQt {
         'Concurrent', 'Core', 'Gui', 'Network', 'PrintSupport', 'Widgets',
         'OpenGL', 'Multimedia', 'MultimediaWidgets', 'DBus'
     ]
+    modulePlugins: base.concat(['mediaservice'])
     moduleTranslations: ['qt_zh_CN.qm', 'qt_help_zh_CN.qm']
 }
