@@ -42,7 +42,6 @@ SourceView::SourceView(QWidget *parent)
     buttonRecognition_ = new JRoundButton(tr("Recognition"), this);
     buttonRecognition_->setFixedSize(150, 40);
     buttonRecognition_->setBorderRadius(20);
-    buttonRecognition_->hide();
     layoutRight->addWidget(buttonRecognition_);
 
     stackedWidget_ = new QStackedWidget(this);
@@ -203,11 +202,6 @@ bool SourceView::init()
     bool result = true;
 
     result = result && videoWidget_->init();
-
-    if (result) {
-        //videoWidget_->show();
-        buttonRecognition_->show();
-    }
 
     Jwt::restoreWidgetState(stackedWidget_);
 

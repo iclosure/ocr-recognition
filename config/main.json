@@ -4,5 +4,11 @@
       "theme" : {
          "name" : "light"
       }
+   },
+   "ocr": {
+     "template": {
+       "type": "excel",
+       "filePath": "@ConfigDir@/XXX整机设备组成编号装入关系表.xlsx"
+     }
    }
 }

@@ -6,7 +6,7 @@ import 'tools/qbs/imports' as I
 I.JSolution {
     projectName: 'ocr-devinfo'
     projectDisplayName: 'OCR-DevInfo'
-    version: '1.0.1'
+    version: '1.0.2'
     buildVersion: 1
 
     readonly property bool useVcPkg: true

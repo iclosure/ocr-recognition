@@ -4,10 +4,12 @@
 #include "jwt/widget/JGroupBox.h"
 #include "jwt/widget/JRoundButton.h"
 #include "common/OCRMgr.h"
+#include "common/ExcelMgr.h"
 #include "ImageLabel.h"
 #include "SourceView.h"
 #include <QFormLayout>
 #include <QPlainTextEdit>
+#include <QMessageBox>
 #include <QDebug>
 
 // class HomeWindow
@@ -21,7 +23,7 @@ HomeWindow::HomeWindow(QWidget *parent)
     layoutMain->setContentsMargins(0, 0, 0, 0);
     layoutMain->setSpacing(0);
 
-    splitter_ = new JSplitter({1, 1, 1}, this);
+    splitter_ = new JSplitter({2, 1, 1}, this);
     splitter_->setObjectName(QLatin1String("home.splitter"));
     splitter_->setOpaqueResize(true);
     splitter_->setChildrenCollapsible(false);
@@ -44,7 +46,7 @@ HomeWindow::HomeWindow(QWidget *parent)
 
     editDevInfo_ = new QPlainTextEdit(groupRight);
     editDevInfo_->setMinimumWidth(300);
-    editDevInfo_->setReadOnly(true);
+    //editDevInfo_->setReadOnly(true);
     layoutRight->addWidget(editDevInfo_);
 
     buttonGenReport_ = new JRoundButton(tr("Generate report"), groupRight);
@@ -84,7 +86,25 @@ HomeWindow::HomeWindow(QWidget *parent)
         updateImage();
     });
     connect(buttonGenReport_, &JRoundButton::clicked, this, [=](){
+        const QString text = editDevInfo_->toPlainText().trimmed();
+        if (text.isEmpty()) {
+            return;
+        }
+        // parse
+        QMap<QString, QStringList> groups;
+        ExcelMgr::parseGroups(text, groups);
+        if (groups.isEmpty()) {
+            return;
+        }
         //
+        int rowOffset = -1;
+        QString message;
+        if (ExcelMgr::instance()->saveGroups(groups, rowOffset)) {
+            message = tr("Save successfully!");
+        } else {
+            message = tr("Save failure!");
+        }
+        QMessageBox::warning(this, tr("Finished saving"), message);
     });
 }
 

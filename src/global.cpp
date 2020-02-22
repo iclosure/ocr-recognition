@@ -1,5 +1,7 @@
 ﻿#include "global.h"
 #include "common/Logging.h"
+#include "common/OCRMgr.h"
+#include "common/ExcelMgr.h"
 #include "SplashWidget.h"
 #include "mainview/MainWindow.h"
 #include "jwt/JLangManager.h"
@@ -345,12 +347,24 @@ int JMain::execApp(QApplication *app)
     JMain::instance()->setTheme(theme);
 #endif
     initFontDatabase();
-    Logging::instance()->init();
 
     auto releaseInstances = [=](){
+        OCRMgr::releaseInstance();
+        ExcelMgr::releaseInstance();
         Logging::releaseInstance();
         JMain::releaseInstance();
     };
+
+    if (!ExcelMgr::instance()->init()) {
+        releaseInstances();
+        return -1;
+    }
+
+    if (!Logging::instance()->init()) {
+        releaseInstances();
+        return -1;
+    }
+
     // initialize models
     bool result = instance()->init();
     if (!result) {

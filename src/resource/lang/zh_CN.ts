@@ -70,14 +70,29 @@
 <context>
     <name>HomeWindow</name>
     <message>
-        <location filename="../../module/home/HomeWindow.cpp" line="39"/>
+        <location filename="../../module/home/HomeWindow.cpp" line="41"/>
         <source>Reognition informations</source>
         <translation>识别信息</translation>
     </message>
     <message>
-        <location filename="../../module/home/HomeWindow.cpp" line="50"/>
+        <location filename="../../module/home/HomeWindow.cpp" line="52"/>
         <source>Generate report</source>
         <translation>生成报表</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/HomeWindow.cpp" line="103"/>
+        <source>Save successfully!</source>
+        <translation>保存成功！</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/HomeWindow.cpp" line="105"/>
+        <source>Save failure!</source>
+        <translation>保存失败！</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/HomeWindow.cpp" line="107"/>
+        <source>Finished saving</source>
+        <translation>生成结束</translation>
     </message>
 </context>
 <context>
