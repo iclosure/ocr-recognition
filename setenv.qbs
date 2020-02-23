@@ -100,6 +100,7 @@ Project {
                         items.push('tesseract41d.dll')
                     } else {
                         items.push('tesseract41.dll')
+                        items.push('pvt.cppan.demo.*.dll')
                     }
                 }
                 return items
