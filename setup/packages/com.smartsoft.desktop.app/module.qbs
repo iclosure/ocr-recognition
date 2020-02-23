@@ -94,8 +94,8 @@ PackageApp {
                 }
             } else {
                 items = [
-                            'bin/opencv_videoio_ffmpeg411_64.dll',
-                            'x64/vc15/bin/opencv_world411.dll'
+                            'bin/opencv_videoio_ffmpeg' + project.opencvVersion + '_64.dll',
+                            'x64/vc15/bin/opencv_world' + project.opencvVersion + '.dll'
                         ]
             }
             return items

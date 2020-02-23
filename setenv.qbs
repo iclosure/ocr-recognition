@@ -74,11 +74,11 @@ Project {
                     items.push('leptonica-1.78.0' + EnvUtils.dylibSuffix(qbs))
                 } else {
                     if (qbs.architecture == 'x86_64') {
-                        items.push('opencv_videoio_ffmpeg411_64.dll')
-                        items.push('../x64/vc15/bin/opencv_world411.dll')
+                        items.push('opencv_videoio_ffmpeg' + project.opencvVersion + '_64.dll')
+                        items.push('../x64/vc15/bin/opencv_world' + project.opencvVersion + '.dll')
                     } else {
-                        items.push('opencv_videoio_ffmpeg411.dll')
-                        //items.push('../x86/vc15/bin/opencv_world411.dll')
+                        items.push('opencv_videoio_ffmpeg' + project.opencvVersion + '.dll')
+                        //items.push('../x86/vc15/bin/opencv_world' + project.opencvVersion + '.dll')
                     }
                 }
                 return items
@@ -90,7 +90,7 @@ Project {
         Group {
             name: 'tesseract'
             condition: !project.useVcPkgStatic
-            prefix: project.useVcPkg ? project.vcpkgLibBin : project.opencvDir + '/bin/'
+            prefix: project.useVcPkg ? project.vcpkgLibBin : project.tesseractDir + '/bin/'
             files: {
                 var items = []
                 if (project.useVcPkg) {

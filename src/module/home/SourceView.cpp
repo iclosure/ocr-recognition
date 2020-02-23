@@ -34,9 +34,10 @@ SourceView::SourceView(QWidget *parent)
     buttonResetSettings_->setBorderRadius(20);
     layoutRight->addWidget(buttonResetSettings_);
 
-    buttonSwitchView_ = new JRoundButton(tr("Switch View"), this);
+    buttonSwitchView_ = new JRoundButton(tr("Camera Mode"), this);
     buttonSwitchView_->setFixedSize(150, 40);
     buttonSwitchView_->setBorderRadius(20);
+    buttonSwitchView_->setCheckable(true);
     layoutRight->addWidget(buttonSwitchView_);
 
     buttonRecognition_ = new JRoundButton(tr("Recognition"), this);
@@ -118,6 +119,7 @@ SourceView::SourceView(QWidget *parent)
     connect(stackedWidget_, &QStackedWidget::currentChanged, this, [=](int index){
         Q_UNUSED(index)
         Q_EMIT filePathChanged(QString());
+        buttonSwitchView_->setChecked(index == 0 ? false : true);
         updateStackCurrentIndex();
     });
     connect(imageLabel_, &ImageLabel::filePathChanged, [=](const QString &filePath){
@@ -150,8 +152,9 @@ SourceView::SourceView(QWidget *parent)
             break;
         }
     });
-    connect(buttonSwitchView_, &JRoundButton::clicked, [=](){
-        if (currentIndex() == 0) {
+    connect(buttonSwitchView_, &JRoundButton::toggled, [=](bool checked){
+        buttonSwitchView_->setText(checked ? tr("Picture Mode") : tr("Camera Mode"));
+        if (checked) {
             setCurrentIndex(1);
         } else {
             setCurrentIndex(0);

@@ -6,10 +6,10 @@ import 'tools/qbs/imports' as I
 I.JSolution {
     projectName: 'ocr-devinfo'
     projectDisplayName: 'OCR-DevInfo'
-    version: '1.0.2'
+    version: '1.0.3'
     buildVersion: 1
 
-    readonly property bool useVcPkg: true
+    readonly property bool useVcPkg: false
     readonly property bool useVcPkgStatic: false
     readonly property path vcpkgHome: Environment.getEnv('VCPKG_HOME')
     readonly property path vcpkgLibHome: FileInfo.joinPaths(vcpkgHome, 'installed',
@@ -19,4 +19,6 @@ I.JSolution {
     readonly property path opencvDir: Environment.getEnv('OPENCV_HOME')
     readonly property path tesseractDir: Environment.getEnv('Tesseract_DIR')
     //readonly property path tesseractDir: "C:/Program Files/tesseract"
+
+    readonly property string opencvVersion: '420'
 }

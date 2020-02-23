@@ -6,7 +6,7 @@ import qbs.Environment
 IFWSetup {
     setupPath: path
 
-    readonly property bool useVcPkg: true
+    readonly property bool useVcPkg: false
     readonly property bool useVcPkgStatic: false
     readonly property path vcpkgHome: Environment.getEnv('VCPKG_HOME')
     readonly property path vcpkgLibHome: FileInfo.joinPaths(vcpkgHome, 'installed',
@@ -17,4 +17,5 @@ IFWSetup {
     readonly property path tesseractDir: Environment.getEnv('Tesseract_DIR')
     //readonly property path tesseractDir: "C:/Program Files/tesseract"
 
+    readonly property string opencvVersion: '420'
 }

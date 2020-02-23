@@ -61,7 +61,8 @@ WidgetApp {
             }
         } else {
             // OpenCV
-            items.push(project.opencvDir + '/x64/vc15/lib/opencv_world411' + suffix + '.lib')
+            items.push(project.opencvDir + '/x64/vc15/lib/opencv_world' + project.opencvVersion
+                       + suffix + '.lib')
             // tesseract
             items.push(project.tesseractDir + '/lib/tesseract41' + suffix + '.lib')
         }

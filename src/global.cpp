@@ -5,6 +5,7 @@
 #include "SplashWidget.h"
 #include "mainview/MainWindow.h"
 #include "jwt/JLangManager.h"
+#include "SettingsDialog.h"
 #include <QFileSystemWatcher>
 #include <QApplication>
 #include <QSettings>
@@ -113,6 +114,9 @@ private:
     bool neeedToRestart;
     MainWindow *mainWindow;
     static QString appDirPath;
+    //
+    QString productType;
+    QString productNumber;
 };
 
 QString JMainPrivate::appDirPath = QString();
@@ -348,22 +352,44 @@ int JMain::execApp(QApplication *app)
 #endif
     initFontDatabase();
 
-    auto releaseInstances = [=](){
+    SplashWidget *splashWidget = nullptr;
+
+    auto releaseInstances = [=,&splashWidget](){
+        if (splashWidget) {
+            delete splashWidget;
+            splashWidget = nullptr;
+        }
         OCRMgr::releaseInstance();
         ExcelMgr::releaseInstance();
         Logging::releaseInstance();
         JMain::releaseInstance();
     };
 
-    if (!ExcelMgr::instance()->init()) {
-        releaseInstances();
-        return -1;
-    }
-
     if (!Logging::instance()->init()) {
         releaseInstances();
         return -1;
     }
+
+    //
+    SettingsDialog *settingsDialog = new SettingsDialog();
+    if (!settingsDialog->init()) {
+        QMessageBox::critical(nullptr, QStringLiteral("Error"),
+                              QStringLiteral("Initialize settings dialog failure!"));
+        delete settingsDialog;
+        releaseInstances();
+        return -1;
+    }
+    if (settingsDialog->exec() != QDialog::Accepted) {
+        delete settingsDialog;
+        releaseInstances();
+        return -1;
+    }
+
+    delete settingsDialog;
+    settingsDialog = nullptr;
+
+    splashWidget = new SplashWidget();
+    splashWidget->show();
 
     // initialize models
     bool result = instance()->init();
@@ -373,6 +399,12 @@ int JMain::execApp(QApplication *app)
         releaseInstances();
         return -1;
     }
+
+    if (!ExcelMgr::instance()->init()) {
+        releaseInstances();
+        return -1;
+    }
+
     // mainWindow
     auto mainWindow = createMainWindow();
     if (!mainWindow) {
@@ -381,6 +413,10 @@ int JMain::execApp(QApplication *app)
         releaseInstances();
         return -1;
     }
+
+    splashWidget->hide();
+    delete splashWidget;
+    splashWidget = nullptr;
 
     mainWindow->showNormal();
 
@@ -575,6 +611,30 @@ QStringList JMain::modules()
 QString JMain::tessdataDir()
 {
     return QCoreApplication::applicationDirPath().append(QLatin1String("/../tessdata"));
+}
+
+QString JMain::productType() const
+{
+    Q_D(const JMain);
+    return d->productType;
+}
+
+void JMain::setProductType(const QString &text)
+{
+    Q_D(JMain);
+    d->productType = text;
+}
+
+QString JMain::productNumber() const
+{
+    Q_D(const JMain);
+    return d->productNumber;
+}
+
+void JMain::setProductNumber(const QString &text)
+{
+    Q_D(JMain);
+    d->productNumber = text;
 }
 
 void JMain::setTheme(const QString &text)

@@ -161,6 +161,34 @@
     </message>
 </context>
 <context>
+    <name>SettingsDialog</name>
+    <message>
+        <location filename="../../SettingsDialog.cpp" line="18"/>
+        <source>Settings</source>
+        <translation>设置</translation>
+    </message>
+    <message>
+        <location filename="../../SettingsDialog.cpp" line="25"/>
+        <source>Select Type:</source>
+        <translation>选择型号：</translation>
+    </message>
+    <message>
+        <location filename="../../SettingsDialog.cpp" line="28"/>
+        <source>Input Number:</source>
+        <translation>输入编号：</translation>
+    </message>
+    <message>
+        <location filename="../../SettingsDialog.cpp" line="35"/>
+        <source>Ok</source>
+        <translation>确定</translation>
+    </message>
+    <message>
+        <location filename="../../SettingsDialog.cpp" line="41"/>
+        <source>Cancel</source>
+        <translation>取消</translation>
+    </message>
+</context>
+<context>
     <name>SettingsView</name>
     <message>
         <location filename="../../module/home/SettingsView.cpp" line="17"/>
@@ -211,22 +239,28 @@
         <translation>复位参数</translation>
     </message>
     <message>
-        <location filename="../../module/home/SourceView.cpp" line="42"/>
+        <location filename="../../module/home/SourceView.cpp" line="37"/>
+        <location filename="../../module/home/SourceView.cpp" line="156"/>
+        <source>Camera Mode</source>
+        <translation>拍摄模式</translation>
+    </message>
+    <message>
+        <location filename="../../module/home/SourceView.cpp" line="43"/>
         <source>Recognition</source>
         <translation>识别字符</translation>
     </message>
     <message>
-        <location filename="../../module/home/SourceView.cpp" line="37"/>
-        <source>Switch View</source>
-        <translation>切换视图</translation>
+        <location filename="../../module/home/SourceView.cpp" line="156"/>
+        <source>Picture Mode</source>
+        <translation>相册模式</translation>
     </message>
 </context>
 <context>
     <name>SplashWidget</name>
     <message>
-        <location filename="../../SplashWidget.cpp" line="14"/>
+        <location filename="../../SplashWidget.cpp" line="17"/>
         <source>Initializing...</source>
-        <translation>正在初始化……</translation>
+        <translation>正在初始化，请稍候……</translation>
     </message>
 </context>
 </TS>

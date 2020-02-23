@@ -1,4 +1,13 @@
 
+-- V1.0.3
+    tools: VS2015，Qt5.10.0，Qbs>=1.10.0
+    depends:
+        1) jframework: v2.10.0
+        1) datastudio: v4.7.31
+    fixed:
+        1) 增加产品信息填写对话框
+        2) 修复编译错误
+
 -- V1.0.2
     tools: VS2015，Qt5.10.0，Qbs>=1.10.0
     depends:

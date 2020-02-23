@@ -78,6 +78,13 @@ public:
 
     static QString tessdataDir();
 
+    //
+    QString productType() const;
+    void setProductType(const QString &text);
+
+    QString productNumber() const;
+    void setProductNumber(const QString &text);
+
 signals:
     void themeChanged(const QString &currnt, const QString &previous);
     void printerNameChanged(const QString &currnt, const QString &previous);
