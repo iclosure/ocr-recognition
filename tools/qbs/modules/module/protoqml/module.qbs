@@ -2,9 +2,9 @@ import qbs
 import '../ModuleBase.qbs' as ModuleBase
 
 ModuleBase {
-    moduleName: 'protometa'
+    moduleName: 'protoqml'
 
-    Depends { name: 'Qt'; submodules: ['gui', 'concurrent', 'network'] }
+    Depends { name: 'Qt'; submodules: ['concurrent', 'network', 'qml', 'quick'] }
 //    Depends {
 //        condition: qbs.targetOS.contains('windows')
 //        name: 'module'; submodules: ['log4cpp', 'qtftp', 'qttelnet'];

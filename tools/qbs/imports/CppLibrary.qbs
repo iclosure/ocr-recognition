@@ -8,11 +8,11 @@ Library {
     property bool useQt: true
     property bool useQtCore: true
     property bool isBundle: false
-    property bool isDynamicLibrary: true
+    property bool isDyLibrary: true
 
     type: {
         var items = ['translation']
-        if (isDynamicLibrary) {
+        if (isDyLibrary) {
             items.push('dynamiclibrary')
             if (isForAndroid) {
                 items.push('android.nativelibrary')
@@ -76,7 +76,7 @@ Library {
     // install
     property stringList installFileTags: {
         var items = []
-        if (isDynamicLibrary) {
+        if (isDyLibrary) {
             items.push('dynamiclibrary')
             items.push('dynamiclibrary_symlink')
             if (isForAndroid) {
@@ -87,7 +87,7 @@ Library {
         }
         return items
     }
-    property bool defaultInstall: isDynamicLibrary
+    property bool defaultInstall: isDyLibrary
     property string installPrefix: 'bin'
     property string installDir: ''
 
@@ -104,7 +104,7 @@ Library {
         var items = base
         var upperName = product.name.toUpperCase()
         upperName = upperName.replace(/-/g, '_')
-        if (isDynamicLibrary) {
+        if (isDyLibrary) {
             items.push(upperName + '_LIB')
             items.push(upperName + '_BUILD')
         }
@@ -143,7 +143,7 @@ Library {
         cpp.cxxStandardLibrary: 'libc++'
 
         Properties {
-            condition: !isDynamicLibrary
+            condition: !isDyLibrary
             cpp.visibility: 'hidden'
         }
 
@@ -204,18 +204,24 @@ Library {
     Export {
         condition: product.defaultExport
         Depends { name: 'cpp' }
-        cpp.defines: [ product.name.toUpperCase() + '_LIB' ]
+        cpp.defines: {
+            var items = []
+            if (product.isDyLibrary) {
+                items.push(product.name.toUpperCase() + '_LIB')
+            }
+            return items
+        }
         cpp.includePaths: [FileInfo.joinPaths(project.sourceDirectory, 'include', product.modulePath)]
 
         Properties {
-            condition: qbs.targetOS.contains('windows') && product.isDynamicLibrary
+            condition: qbs.targetOS.contains('windows') && product.isDyLibrary
 
             cpp.dynamicLibraries: {
                 var items = []
                 //
                 var fullPath = EnvUtils.libFullName(product, product.targetName,
                                                     product.cpp.variantSuffix,
-                                                    product.isDynamicLibrary)
+                                                    product.isDyLibrary)
                 var path = FileInfo.joinPaths(project.sourceDirectory, 'lib', project.archDir,
                                               product.modulePath, fullPath)
                 items.push(path)
@@ -223,13 +229,13 @@ Library {
             }
         }
         Properties {
-            condition: qbs.targetOS.contains('windows') && !product.isDynamicLibrary
+            condition: qbs.targetOS.contains('windows') && !product.isDyLibrary
             cpp.staticLibraries: {
                 var items = []
                 //
                 var fullPath = EnvUtils.libFullName(product, product.targetName,
                                                     product.cpp.variantSuffix,
-                                                    product.isDynamicLibrary)
+                                                    product.isDyLibrary)
                 var path = FileInfo.joinPaths(project.sourceDirectory, 'lib', project.archDir,
                                               product.modulePath, fullPath)
                 items.push(path)

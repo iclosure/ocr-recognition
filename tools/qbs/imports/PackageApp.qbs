@@ -32,7 +32,10 @@ PackageProduct {
         condition: installSystem32Api && qbs.targetOS.contains('windows')
         prefix: {
             var vsVersion = Environment.getEnv('VisualStudioVersion')
-            var versionFlag = Utilities.versionCompare(vsVersion, '15.0')
+            var versionFlag = -1
+            if (vsVersion) {
+                versionFlag = Utilities.versionCompare(vsVersion, '15.0')
+            }
             var path = undefined
             if (versionFlag >= 0) {
                 //path = FileInfo.joinPaths(Environment.getEnv('DevEnvDir'))
@@ -56,7 +59,10 @@ PackageProduct {
         prefix: {
             var config = qbs.buildVariant === 'debug' ? 'debug_nonredist' : ''
             var vsVersion = Environment.getEnv('VisualStudioVersion')
-            var versionFlag = Utilities.versionCompare(vsVersion, '15.0')
+            var versionFlag = -1
+            if (vsVersion) {
+                versionFlag = Utilities.versionCompare(vsVersion, '15.0')
+            }
             var debugFlag = (qbs.buildVariant ==='debug')
             var redistDir = FileInfo.fromNativeSeparators(
                         Environment.getEnv(versionFlag >= 0 ? 'VCToolsRedistDir' : 'VCINSTALLDIR'))

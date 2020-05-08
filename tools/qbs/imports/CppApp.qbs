@@ -1,6 +1,7 @@
 import qbs
 import qbs.File
 import qbs.FileInfo
+import qbs.Environment
 import tools.EnvUtils
 
 CppApplication {
@@ -8,6 +9,28 @@ CppApplication {
 
     property var pairInstallNames: undefined
     property bool linkQtCore: false
+    property bool checkMemoryLeak: false
+    property string vldPath: ''
+    readonly property bool __vldEnabled: checkMemoryLeak && qbs.targetOS.contains('windows')
+                                         && qbs.buildVariant == 'debug'
+    readonly property string __vldPath: {
+        if (vldPath) {
+            return vldPath
+        }
+        var path = project.sourceDirectory + '/tools/libraries/VLD'
+        if (File.exists(path + '/bin')) {
+            return path
+        }
+        path = Environment.getEnv('VLD_PATH')
+        if (path) {
+            return path
+        }
+        if (qbs.architecture == 'x86_64') {
+            return 'C:/Program Files/Visual Leak Detector'
+        } else {
+            return 'C:/Program Files (x86)/Visual Leak Detector'
+        }
+    }
 
     Depends { name: 'Qt.core'; cpp.link: linkQtCore }
     Depends { name: 'Qt.qminimal'; condition: Qt.core.staticBuild }
@@ -30,6 +53,41 @@ CppApplication {
     desc.version: version
     desc.productName: name
 
+    Properties {
+        condition: __vldEnabled
+        cpp.includePaths: base.concat([__vldPath + '/include'])
+        cpp.libraryPaths: {
+            var items = base
+            if (qbs.architecture == 'x86') {
+                items.push(__vldPath + '/lib/Win32')
+            } else {
+                items.push(__vldPath + '/lib/Win64')
+            }
+            return items
+        }
+    }
+
+    Group {
+        name: 'VLD Files'
+        condition: __vldEnabled
+        files: {
+            var items = [__vldPath + '/vld.ini']
+            var sys, arch
+            if (qbs.architecture == 'x86') {
+                sys = '32'; arch = '86'
+            } else {
+                sys = '64'; arch = '64'
+            }
+            items.push(__vldPath + '/bin/Win' + sys + '/Microsoft.DTfW.DHL.manifest')
+            items.push(__vldPath + '/bin/Win' + sys + '/dbghelp.dll')
+            items.push(__vldPath + '/bin/Win' + sys + '/vld_x' + arch + '.dll')
+            return items
+        }
+        qbs.install: true
+        qbs.installPrefix: project.projectName
+        qbs.installDir: 'bin'
+    }
+
     cpp.defines: {
         var items = [ 'PROJECT_DIR="' + project.sourceDirectory + '"' ]
         //
@@ -48,10 +106,19 @@ CppApplication {
         }
         // build version
         items.push('BUILD_VERSION="' + project.buildVersion + '"')
+        // check memory leak
+        if (__vldEnabled) {
+            items.push('J_CHECK_MEMORY_LEAK')
+        }
         return items
     }
     cpp.variantSuffix: project.variantSuffix
     cpp.separateDebugInformation: qbs.debugInformation
+
+    Properties {
+        condition: qbs.targetOS.contains('windows')
+        cpp.dynamicLibraries: [ 'user32' ]
+    }
 
     Properties {
         condition: qbs.targetOS.contains('linux')

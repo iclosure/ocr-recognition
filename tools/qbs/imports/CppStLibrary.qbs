@@ -1,5 +1,5 @@
 import qbs
 
 CppLibrary {
-    isDynamicLibrary: false
+    isDyLibrary: false
 }

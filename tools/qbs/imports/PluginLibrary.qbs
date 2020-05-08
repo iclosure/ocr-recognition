@@ -26,11 +26,11 @@ CppLibrary {
     //cpp.useCxxPrecompiledHeader: false
 
     cpp.defines: {
-        var defines = base
+        var items = base
         if (uri.length > 0) {
-            defines.push('PLUGIN_URI=\"' + uri + '\"')
+            items.push('PLUGIN_URI=\"' + uri + '\"')
         }
-        return defines
+        return items
     }
 
     Group {

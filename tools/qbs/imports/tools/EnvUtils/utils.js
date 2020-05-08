@@ -101,16 +101,8 @@ function datastudioCoreDir(project) {
     return FileInfo.joinPaths(datastudioDir(project), 'src', 'core')
 }
 
-function jframe3rdpartVisible(project) {
-    return (project.buildQuote && File.exists(jframe3rdpartDir(project) + '/3rdpart.qbs'))
-}
-
 function datastudioCoreVisible(project) {
     return (project.buildQuote && File.exists(datastudioCoreDir(project) + '/core.qbs'))
-}
-
-function jframe3rdpartPrefix(project) {
-    return jframe3rdpartVisible(project) ? '' : '3rdpart'
 }
 
 function datastudioCorePrefix(project) {
