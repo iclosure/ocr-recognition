@@ -48,8 +48,7 @@ Module {
             content = content.replace(/@PROJECT_DISPLAY_NAME@/g, _project.projectDisplayName)
             //
             var target = FileInfo.joinPaths(_project.sourceDirectory,
-                                            FileInfo.completeBaseName(_project.sourceDirectory)
-                                            + '-' + FileInfo.completeBaseName(source))
+                                            _project.projectName + '-' + FileInfo.completeBaseName(source))
             var targetFile = new TextFile(target, TextFile.WriteOnly)
             targetFile.write(content)
             targetFile.close()
